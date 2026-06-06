@@ -1,0 +1,139 @@
+<%- include('../partials/header') %>
+
+<body>
+
+    <!-- Top Header -->
+    <header class="top-header">
+
+        <div class="social-icons">
+            <i class="fab fa-facebook-f"></i>
+            <i class="fab fa-twitter"></i>
+            <i class="fab fa-youtube"></i>
+            <i class="fab fa-instagram"></i>
+        </div>
+
+        <div class="header-actions">
+
+            <!-- Logout -->
+            <div class="action-item">
+
+                <form
+                    action="/logout"
+                    method="POST"
+                >
+                    <button
+                        type="submit"
+                        class="logout-btn"
+                    >
+                        <i class="fas fa-sign-in-alt"></i>
+                        Logout
+                    </button>
+                </form>
+
+            </div>
+
+            <!-- Account -->
+            <div class="action-item">
+                <i class="fas fa-user"></i>
+                <span>Account</span>
+            </div>
+
+            <!-- Cart -->
+            <div class="action-item">
+                <i class="fas fa-cart-plus"></i>
+            </div>
+
+            <!-- Search -->
+            <div class="action-item">
+                <i class="fas fa-search"></i>
+            </div>
+
+        </div>
+
+    </header>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+
+        <div class="logo">
+            <h1>
+                Lantern &
+                <br>
+                Leaf
+            </h1>
+        </div>
+
+        <ul class="nav-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Featured</a></li>
+            <li><a href="#">Popular</a></li>
+            <li><a href="#">Offer</a></li>
+            <li><a href="#">Articles</a></li>
+        </ul>
+
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+
+        <div class="hero-content">
+
+            <h1>
+                Life Of The
+                <br>
+                Wild
+            </h1>
+
+            <p>
+                Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit.
+                Sed eu feugiat amet, libero
+                ipsum enim pharetra hac.
+                Urna commodo, lacus ut magna
+                velit eleifend.
+            </p>
+
+            <button class="read-more-btn">
+                READ MORE
+                <i class="fas fa-arrow-right"></i>
+            </button>
+
+        </div>
+
+        <div class="hero-image">
+
+            <img
+                src="/images/homeBook.png"
+                alt="Book Cover"
+            >
+
+        </div>
+
+    </section>
+
+    <!-- Bottom Icons -->
+    <section class="bottom-icons">
+
+        <div class="icon-box">
+            <i class="fas fa-graduation-cap"></i>
+        </div>
+
+        <div class="icon-box">
+            <i class="fas fa-leaf"></i>
+        </div>
+
+        <div class="icon-box">
+            <i class="fas fa-award"></i>
+        </div>
+
+        <div class="icon-box">
+            <i class="fas fa-h"></i>
+        </div>
+
+        <div class="icon-box">
+            <i class="fas fa-book"></i>
+        </div>
+
+    </section>
+
+<%- include('../partials/footer') %>

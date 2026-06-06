@@ -1,0 +1,37 @@
+<%- include('../partials/header') %>
+      
+<div class="wrapper fadeInDown">
+  <div id="formContent">
+    <!-- Tabs Titles -->
+
+    <!-- Icon -->
+    <div class="fadeIn first">
+    <h1 class="lead"> Login</h1>
+    </div>
+<% if(typeof error !== 'undefined' && error){ %>
+    <div class="alert alert-danger">
+        <%= error %>
+    </div>
+<% } %>
+    <!-- Login Form -->
+    <form action="/admin/login" method="post">
+      <input type="text" id="login" 
+      name="username" placeholder="Username"
+       required  class="fadeIn second my-login-input"
+           pattern=".*\S.*" autocomplete="off"
+    title="Username cannot be empty or contain only spaces">
+      <input type="password" id="password"
+       name="password" placeholder="Password"
+         class="fadeIn third my-login-input"
+            pattern=".*\S.*" autocomplete="off"
+    title="Password cannot be empty or contain only spaces" >
+    <a href=""></a>
+    <label for="">Show password
+    <input id="toggleIcon" type="checkbox" class="fa fa-eye" onclick="togglePasswordVisibility()"></i>
+    </label>
+      <input type="submit" class="fadeIn fourth" value="Log In">
+    </form>
+  </div>
+</div>
+<%- include('../partials/header') %>
+`

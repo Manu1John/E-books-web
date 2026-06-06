@@ -1,0 +1,379 @@
+import { sendOtpEmail } from "../utils/sendOtpEmail.js";
+import User from "../models/User.js";
+import bcrypt from "bcrypt";
+
+// GET LOGIN
+const getUserLogin = (req, res) => {
+    if (req.session.user) {
+        return res.redirect("/home");
+    }
+    return res.render("user/loginAndSignup", {
+    title: "Signin",
+    cssFile: "loginAndSignup.css",
+    jsFile: "signupAuth.js",
+    error: null,
+    success: null,
+    isSignup: false
+    });
+};
+
+// GET SIGNUP
+const getUserSignup = (req, res) => {
+    if (req.session.user) {
+        return res.redirect("/home");
+    }
+    return res.render("user/loginAndSignup", {
+    title: "Signup",
+    cssFile: "loginAndSignup.css",
+    jsFile: "signupAuth.js",
+    error: null,
+    success: null,
+    isSignup: true
+    });
+};
+
+// POST SIGNUP
+const postUserSignup = async (req, res) => {
+    try {
+        const { firstName, lastName, email, password, confirmPassword } = req.body;
+
+        if (password !== confirmPassword) {
+            return res.render("user/loginAndSignup", {
+    title: "Signup",
+    cssFile: "loginAndSignup.css",
+    jsFile: "signupAuth.js",
+    error: "Passwords do not match",
+    success: null,
+    isSignup: true
+            });
+        }
+
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.render("user/loginAndSignup", {
+    title: "Signup",
+    cssFile: "loginAndSignup.css",
+    jsFile: "signupAuth.js",
+    error: "email already exist",
+    success: null,
+    isSignup: true
+            });
+        }
+
+        // 🔥 SECURITY FIX: Hash the password BEFORE putting it in the session
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // OTP Generation
+        const otp = Math.floor(100000 + Math.random() * 900000);
+
+        // Store safe data in session
+        req.session.userData = {
+            firstName,
+            lastName,
+            email,
+            password: hashedPassword // Now it is securely hashed in the session
+        };
+
+        req.session.userOtp = otp.toString();
+        // 🔥 LOGIC FIX: 2 minutes is much safer for email delivery than 30 seconds
+        req.session.otpExpires = Date.now() + 2 * 60 * 1000; 
+
+        req.session.save(async (err) => {
+            if (err) {
+                return res.render("user/loginAndSignup", {
+    title: "Signup",
+    cssFile: "loginAndSignup.css",
+    jsFile: "signupAuth.js",
+    error: "Session error",
+    success: null,
+    isSignup: true
+                });
+            }
+
+            try {
+                const response = await sendOtpEmail(email, otp);
+                if (!response || !response.messageId) {
+                    throw new Error("Email not delivered by Brevo");
+                }
+                return res.redirect("/verify-otp");
+
+            } catch (emailErr) {
+                console.error("EMAIL ERROR:", emailErr);
+                return res.render("user/loginAndSignup", {
+    title: "Signup",
+    cssFile: "loginAndSignup.css",
+    jsFile: "signupAuth.js",
+    error: "OTP email failed. Please try again.",
+    success: null,
+    isSignup: true
+                });
+            }
+        });
+
+    } catch (error) {
+        console.error("signup error", error);
+        return res.render("user/loginAndSignup", {
+    title: "Signup",
+    cssFile: "loginAndSignup.css",
+    jsFile: "signupAuth.js",
+    error: "An unexpected error occurred",
+    success: null,
+    isSignup: true
+        });
+    }
+};
+
+// GET VERIFY OTP PAGE
+const getVerifyOtp = (req, res) => {
+
+    if (!req.session.userOtp || !req.session.userData) {
+        return res.redirect("/");
+    }
+
+    return res.render("user/verifyOtp", {
+        title: "Verify OTP",
+        cssFile: "verifyOtp.css",
+        jsFile: "verifyOtp.js",
+        error: null,
+        success: null
+    });
+};
+
+// VERIFY OTP
+const verifyOtp = async (req, res) => {
+    try {
+
+        const { otp } = req.body;
+
+        // 1. Validate session existence
+        if (!req.session.userOtp || !req.session.userData) {
+            return res.redirect("/");
+        }
+
+        // 2. Check OTP expiry
+        if (
+            !req.session.otpExpires ||
+            Date.now() > req.session.otpExpires
+        ) {
+            return res.render("user/verifyOtp", {
+                title: "Verify OTP",
+            cssFile: "verifyOtp.css",
+            jsFile: "verifyOtp.js",
+                error: "OTP has expired. Please resend a new one.",
+                success: null
+            });
+        }
+
+        // 3. Normalize OTP input
+        const enteredOtp = String(otp).trim();
+        const storedOtp = String(req.session.userOtp).trim();
+
+        // 4. OTP validation
+        if (enteredOtp !== storedOtp) {
+            return res.render("user/verifyOtp", {
+                title: "Verify OTP",
+            cssFile: "verifyOtp.css",
+            jsFile: "verifyOtp.js",
+                error: "Invalid OTP",
+                success: null
+            });
+        }
+
+        // 5. Validate user data
+        const userData = req.session.userData;
+
+        if (
+            !userData?.email ||
+            !userData?.password
+        ) {
+            return res.redirect("/");
+        }
+
+        // 6. Create user
+        await User.create({
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            email: userData.email,
+            password: userData.password
+        });
+
+        // 7. Destroy session
+        req.session.destroy((err) => {
+            if (err) {
+                console.error(
+                    "Session destroy error:",
+                    err
+                );
+            }
+        });
+
+        // 8. Redirect after success
+        return res.redirect("/");
+
+    } catch (err) {
+
+        console.error(
+            "OTP VERIFY ERROR:",
+            err
+        );
+
+        return res.render("user/verifyOtp", {
+            title: "Verify OTP",
+            cssFile: "verifyOtp.css",
+            jsFile: "verifyOtp.js",
+            error:
+                "Something went wrong during verification. Try again.",
+            success: null
+        });
+    }
+};
+
+// POST LOGIN
+const postUserLogin = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.render("user/loginAndSignup", {
+    title: "Signup",
+    cssFile: "loginAndSignup.css",
+    jsFile: "signupAuth.js",
+    error: "Invalid Email or Password",
+    success: null,
+    isSignup: false
+            });
+        }
+
+        if (user.isBlocked) {
+            return res.render("user/loginAndSignup", {
+    title: "Signup",
+    cssFile: "loginAndSignup.css",
+    jsFile: "signupAuth.js",
+    error: "Your account has been blocked by an admin",
+    success: null,
+    isSignup: false
+            });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (!isMatch) {
+            return res.render("user/loginAndSignup", {
+    title: "Signup",
+    cssFile: "loginAndSignup.css",
+    jsFile: "signupAuth.js",
+    error: "Invalid Email or Password",
+    success: null,
+    isSignup: false
+            });
+        }
+
+        // SESSION CREATE
+        req.session.user = {
+            id: user._id,
+            email: user.email
+        };
+
+        req.session.save((err) => {
+            if (err) {
+                console.error(err);
+                return res.render("user/loginAndSignup", {
+    title: "Signup",
+    cssFile: "loginAndSignup.css",
+    jsFile: "signupAuth.js",
+    error: "Session Error",
+    success: null,
+    isSignup: false
+                });
+            }
+            return res.redirect("/home");
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.render("user/loginAndSignup", {
+    title: "Signup",
+    cssFile: "loginAndSignup.css",
+    jsFile: "signupAuth.js",
+    error: "Login Failed",
+    success: null,
+    isSignup: false
+        });
+    }
+};
+
+// HOME
+const getHome = (req, res) => {
+    if (!req.session.user) {
+        return res.redirect("/");
+    }
+    return res.render("user/home", {
+    title: "home",
+    cssFile: "home.css",
+    user: req.session.user
+    });
+};
+
+// RESEND OTP  
+const resendOtp = async (req, res) => {
+    try {
+        const userData = req.session.userData;
+
+        if (!userData?.email) {
+            return res.redirect("/");
+        }
+
+        const otp = Math.floor(100000 + Math.random() * 900000);
+
+        req.session.userOtp = otp.toString();
+        // 🔥 LOGIC FIX: Match the new 2-minute timer
+        req.session.otpExpires = Date.now() + 2 * 60 * 1000; 
+
+        await new Promise((resolve, reject) => {
+            req.session.save((err) => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+
+        await sendOtpEmail(userData.email, otp);
+
+        return res.render("user/verifyOtp", {
+            title: "Verify OTP",
+            cssFile: "verifyOtp.css",
+            jsFile: "verifyOtp.js",
+            error: null,
+            success: "A new OTP has been sent to your email."
+        });
+
+    } catch (error) {
+        console.error("RESEND OTP ERROR:", error?.response?.text || error.message);
+        return res.render("user/verifyOtp", {
+            title: "Verify OTP",
+            cssFile: "verifyOtp.css",
+            jsFile: "verifyOtp.js",
+            error: "Failed to resend OTP",
+            success: null
+        });
+    }
+};
+
+// LOGOUT
+const postUserLogout = (req, res) => {
+    delete req.session.user;
+    res.clearCookie("connect.sid");
+    return res.redirect("/");
+};
+
+export default {
+    getUserLogin,
+    getUserSignup,
+    postUserSignup,
+    postUserLogin,
+    getHome,
+    postUserLogout,
+    resendOtp,
+    verifyOtp,
+    getVerifyOtp
+};
