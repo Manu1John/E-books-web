@@ -9,8 +9,12 @@ import userController from "../controlers/userControler.js";
 
 const router = express.Router();
 
+
+//index page
+router.get("/",disableCache,userController.getuserIndex)
+
 // LOGIN PAGE
-router.get("/", disableCache, userController.getUserLogin);
+router.get("/login", disableCache, userController.getUserLogin);
 
 // SIGNUP PAGE
 router.get("/signup-user", disableCache, userController.getUserSignup);

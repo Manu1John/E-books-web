@@ -2,6 +2,13 @@ import { sendOtpEmail } from "../utils/sendOtpEmail.js";
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
 
+const getuserIndex = (req,res)=>{
+    if(req.session.user){
+        return res.redirect("/home")
+    }
+    return res.render("user/index")
+}
+
 // GET LOGIN
 const getUserLogin = (req, res) => {
     if (req.session.user) {
@@ -147,7 +154,7 @@ const verifyOtp = async (req, res) => {
 
         // 1. Validate session existence
         if (!req.session.userOtp || !req.session.userData) {
-            return res.redirect("/");
+            return res.redirect("/login");
         }
 
         // 2. Check OTP expiry
@@ -186,7 +193,7 @@ const verifyOtp = async (req, res) => {
             !userData?.email ||
             !userData?.password
         ) {
-            return res.redirect("/");
+            return res.redirect("/login");
         }
 
         // 6. Create user
@@ -208,7 +215,7 @@ const verifyOtp = async (req, res) => {
         });
 
         // 8. Redirect after success
-        return res.redirect("/");
+        return res.redirect("/login");
 
     } catch (err) {
 
@@ -367,6 +374,7 @@ const postUserLogout = (req, res) => {
 };
 
 export default {
+    getuserIndex,
     getUserLogin,
     getUserSignup,
     postUserSignup,
