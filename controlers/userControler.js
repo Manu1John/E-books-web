@@ -63,6 +63,76 @@ const getUserLogin = (req, res) => {
     }
 };
 
+//LOGIN WITH FACEBOOK
+const facebookAuthCallback = async (req, res) => {
+
+    try {
+
+        // Safety check
+        if (!req.user) {
+            return res.redirect("/login");
+        }
+
+        // Blocked account check
+        if (req.user.isBlocked) {
+
+            return res.render(
+                "user/loginAndSignup",
+                {
+                    title: "Signin",
+                    cssFile:
+                        "loginAndSignup.css",
+
+                    jsFile:
+                        "signupAuth.js",
+
+                    error:
+                        "Your account has been blocked by an admin",
+
+                    success: null,
+                    isSignup: false
+                }
+            );
+        }
+
+        // Create session
+        req.session.user = {
+            id: req.user._id,
+            email: req.user.email
+        };
+
+        req.session.save((err) => {
+
+            if (err) {
+
+                console.error(
+                    "Facebook session save error:",
+                    err
+                );
+
+                return res.redirect(
+                    "/login"
+                );
+            }
+
+            return res.redirect(
+                "/home"
+            );
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Facebook callback error:",
+            error
+        );
+
+        return res.redirect(
+            "/login"
+        );
+    }
+};
+
 
 // GET SIGNUP
 const getUserSignup = (req, res) => {
@@ -80,7 +150,7 @@ const getUserSignup = (req, res) => {
 };
 
 // POST SIGNUP
-export const postUserSignup = async (req, res) => {
+ const postUserSignup = async (req, res) => {
     try {
         const { firstName, lastName, email, password, confirmPassword } = req.body;
 
@@ -410,5 +480,6 @@ export default {
     resendOtp,
     verifyOtp,
     getVerifyOtp,
-    googleAuthCallback
+    googleAuthCallback,
+    facebookAuthCallback
 };

@@ -39,4 +39,21 @@ router.get("/auth/google",disableCache,passport.authenticate("google", {scope: [
 // Google Callback
 router.get("/auth/google/callback",disableCache,passport.authenticate("google", {failureRedirect: "/login",session: false}),userController.googleAuthCallback);
 
+
+// --- FACEBOOK AUTHENTICATION ROUTES ---
+
+
+// 1. Trigger Facebook Login screen
+router.get("/auth/facebook", disableCache, passport.authenticate("facebook", {
+    scope: ["email"],
+    authType: "reauthenticate" // 🔥 THIS is the magic word that forces a new login!
+}));
+
+// 2. Handle the incoming redirect back from Facebook
+router.get("/auth/facebook/callback", 
+    passport.authenticate("facebook", { failureRedirect: "/", session: false }), 
+    userController.facebookAuthCallback
+);
+
+
 export default router;

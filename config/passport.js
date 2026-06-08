@@ -1,44 +1,235 @@
-import "dotenv/config"; // 🔥 FORCE dotenv to load directly inside this file first!
+import "dotenv/config";
 import passport from "passport";
-import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+
+import {
+    Strategy as GoogleStrategy
+} from "passport-google-oauth20";
+
+import {
+    Strategy as FacebookStrategy
+} from "passport-facebook";
+
 import User from "../models/User.js";
 
-// 🔍 TEMPORARY DEBUG LOGS
-console.log("--- PASSPORT CONFIG DEBUG ---");
-console.log("GOOGLE_CLIENT_ID:", process.env.GOOGLE_CLIENT_ID);
-console.log("GOOGLE_CLIENT_SECRET:", process.env.GOOGLE_CLIENT_SECRET);
-console.log("------------------------------");
 
-passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    // 🛠️ FIX: Changed from relative path to absolute path matching your port 5000
-    callbackURL: "http://localhost:5000/auth/google/callback" 
-}, async (accessToken, refreshToken, profile, done) => {
-    try {
-        let user = await User.findOne({ email: profile.emails[0].value });
+// ================= GOOGLE STRATEGY =================
 
-        if (user) {
-            if (!user.googleId) {
-                user.googleId = profile.id;
-                await user.save();
+passport.use(
+
+    new GoogleStrategy(
+
+        {
+            clientID:
+                process.env
+                    .GOOGLE_CLIENT_ID,
+
+            clientSecret:
+                process.env
+                    .GOOGLE_CLIENT_SECRET,
+
+            callbackURL:
+                process.env
+                    .GOOGLE_CALLBACK_URL
+        },
+
+        async (
+            accessToken,
+            refreshToken,
+            profile,
+            done
+        ) => {
+
+            try {
+
+                const email =
+                    profile
+                        .emails?.[0]
+                        ?.value
+                        ?.trim()
+                        ?.toLowerCase();
+
+                let user =
+                    await User.findOne({
+                        email
+                    });
+
+                // Existing User
+                if (user) {
+
+                    // Link googleId
+                    if (!user.googleId) {
+
+                        user.googleId =
+                            profile.id;
+
+                        await user.save();
+                    }
+
+                    return done(
+                        null,
+                        user
+                    );
+                }
+
+                // Create new user
+                const newUser =
+                    await User.create({
+
+                        googleId:
+                            profile.id,
+
+                        firstName:
+                            profile.name
+                                .givenName,
+
+                        lastName:
+                            profile.name
+                                .familyName
+                            || "",
+
+                        email
+                    });
+
+                return done(
+                    null,
+                    newUser
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "Google Auth Error:",
+                    error
+                );
+
+                return done(
+                    error,
+                    null
+                );
             }
-            return done(null, user);
         }
+    )
+);
 
-        const newUser = await User.create({
-            googleId: profile.id,
-            firstName: profile.name.givenName,
-            lastName: profile.name.familyName || "",
-            email: profile.emails[0].value
-        });
 
-        return done(null, newUser);
+// ================= FACEBOOK STRATEGY =================
 
-    } catch (error) {
-        console.error("Google Auth Error:", error);
-        return done(error, null);
-    }
-}));
+passport.use(
+
+    new FacebookStrategy(
+
+        {
+            clientID:
+                process.env
+                    .FACEBOOK_APP_ID,
+
+            clientSecret:
+                process.env
+                    .FACEBOOK_APP_SECRET,
+
+            callbackURL:
+                process.env
+                    .FACEBOOK_CALLBACK_URL,
+
+            profileFields: [
+                "id",
+                "name",
+                "emails"
+            ]
+        },
+
+        async (
+            accessToken,
+            refreshToken,
+            profile,
+            done
+        ) => {
+
+            try {
+
+                const email =
+                    profile
+                        .emails?.[0]
+                        ?.value
+                        ?.trim()
+                        ?.toLowerCase()
+                    || null;
+
+                // Email required
+                if (!email) {
+
+                    return done(
+                        new Error(
+                            "Facebook account must have verified email."
+                        ),
+                        null
+                    );
+                }
+
+                let user =
+                    await User.findOne({
+                        email
+                    });
+
+                // Existing user
+                if (user) {
+
+                    // Link Facebook ID
+                    if (
+                        !user.facebookId
+                    ) {
+
+                        user.facebookId =
+                            profile.id;
+
+                        await user.save();
+                    }
+
+                    return done(
+                        null,
+                        user
+                    );
+                }
+
+                // Create new user
+                const newUser =
+                    await User.create({
+
+                        facebookId:
+                            profile.id,
+
+                        firstName:
+                            profile.name
+                                .givenName
+                            || "",
+
+                        lastName:
+                            profile.name
+                                .familyName
+                            || "",
+
+                        email
+                    });
+
+                return done(
+                    null,
+                    newUser
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "Facebook Auth Error:",
+                    error
+                );
+
+                return done(
+                    error,
+                    null
+                );
+            }
+        }
+    )
+);
 
 export default passport;

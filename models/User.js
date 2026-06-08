@@ -27,6 +27,12 @@ const userSchema = new mongoose.Schema({
     googleId: { 
         type: String 
     },
+    // Inside models/User.js (Ensure this field exists in your schema)
+facebookId: {
+    type: String,
+    unique: true,
+    sparse: true // Allows multiple users to not have a facebookId
+},
 },
 {
     timestamps: true
