@@ -1,43 +1,42 @@
+import passport from "passport";
 import express from "express";
 import {
     authenticatedUser,
     disableCache,
 } from "../middleware/authMiddleware.js";
 
-// 🚨 Check your folder spelling! (controllers vs controlers)
-import userController from "../controlers/userControler.js"; 
+import userController from "../controlers/userControler.js";
 
 const router = express.Router();
 
 
-//index page
-router.get("/",disableCache,userController.getuserIndex)
+// INDEX
+router.get("/", disableCache, userController.getuserIndex);
 
-// LOGIN PAGE
+// LOGIN
 router.get("/login", disableCache, userController.getUserLogin);
-
-// SIGNUP PAGE
-router.get("/signup-user", disableCache, userController.getUserSignup);
-
-// SIGNUP POST
-router.post("/signup-user", userController.postUserSignup);
-
-// LOGIN POST
 router.post("/login", userController.postUserLogin);
 
-// HOME (PROTECTED)
-router.get("/home", authenticatedUser, disableCache, userController.getHome);
-router.get("/verify-otp",disableCache, userController.getVerifyOtp);
+// SIGNUP
+router.get("/signup-user", disableCache, userController.getUserSignup);
+router.post("/signup-user", userController.postUserSignup);
 
-
-
-// VERIFY OTP POST
+// OTP
+router.get("/verify-otp", disableCache, userController.getVerifyOtp);
 router.post("/verify-otp", disableCache, userController.verifyOtp);
-
-// RESEND OTP (POST ONLY)
 router.post("/resend-otp", disableCache, userController.resendOtp);
 
+// HOME
+router.get("/home",authenticatedUser,disableCache,userController.getHome);
 // LOGOUT
-router.post("/logout", disableCache, userController.postUserLogout);
+router.post("/logout",disableCache,userController.postUserLogout);
+
+// ================= GOOGLE AUTH =================
+
+// Start Google Login
+router.get("/auth/google",disableCache,passport.authenticate("google", {scope: ["profile", "email"],prompt: "select_account"}));
+
+// Google Callback
+router.get("/auth/google/callback",disableCache,passport.authenticate("google", {failureRedirect: "/login",session: false}),userController.googleAuthCallback);
 
 export default router;

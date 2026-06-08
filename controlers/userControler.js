@@ -1,7 +1,7 @@
 import { sendOtpEmail } from "../utils/sendOtpEmail.js";
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
-
+import AuthService from "../services/authService.js";
 const getuserIndex = (req,res)=>{
     if(req.session.user){
         return res.redirect("/home")
@@ -24,6 +24,46 @@ const getUserLogin = (req, res) => {
     });
 };
 
+///signup with google
+
+ const googleAuthCallback = async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.redirect("/login");
+        }
+
+        if (req.user.isBlocked) {
+            return res.render("user/loginAndSignup", {
+                title: "Signin",
+                cssFile: "loginAndSignup.css",
+                jsFile: "signupAuth.js",
+                error: "Your account has been blocked by an admin",
+                success: null,
+                isSignup: false
+            });
+        }
+
+        req.session.user = {
+            id: req.user._id,
+            email: req.user.email
+        };
+
+        req.session.save((err) => {
+            if (err) {
+                console.error("Google session save error:", err);
+                return res.redirect("/login");
+            }
+
+            return res.redirect("/home");
+        });
+
+    } catch (error) {
+        console.error("Google callback error:", error);
+        return res.redirect("/login");
+    }
+};
+
+
 // GET SIGNUP
 const getUserSignup = (req, res) => {
     if (req.session.user) {
@@ -40,96 +80,82 @@ const getUserSignup = (req, res) => {
 };
 
 // POST SIGNUP
-const postUserSignup = async (req, res) => {
+export const postUserSignup = async (req, res) => {
     try {
         const { firstName, lastName, email, password, confirmPassword } = req.body;
 
+        // 1. Validate Form Inputs
+        if (!firstName?.trim() || !lastName?.trim() || !email?.trim() || !password) {
+            return res.render("user/loginAndSignup", {
+                title: "Signup", cssFile: "loginAndSignup.css", jsFile: "signupAuth.js",
+                error: "All fields are required", success: null, isSignup: true
+            });
+        }
+
         if (password !== confirmPassword) {
             return res.render("user/loginAndSignup", {
-    title: "Signup",
-    cssFile: "loginAndSignup.css",
-    jsFile: "signupAuth.js",
-    error: "Passwords do not match",
-    success: null,
-    isSignup: true
+                title: "Signup", cssFile: "loginAndSignup.css", jsFile: "signupAuth.js",
+                error: "Passwords do not match", success: null, isSignup: true
             });
         }
 
-        const existingUser = await User.findOne({ email });
+        const normalizedEmail = email.trim().toLowerCase();
+
+        // 2. SERVICE CALL: Check for existing user
+        const existingUser = await AuthService.checkExistingUser(normalizedEmail);
         if (existingUser) {
             return res.render("user/loginAndSignup", {
-    title: "Signup",
-    cssFile: "loginAndSignup.css",
-    jsFile: "signupAuth.js",
-    error: "email already exist",
-    success: null,
-    isSignup: true
+                title: "Signup", cssFile: "loginAndSignup.css", jsFile: "signupAuth.js",
+                error: "Email already exists", success: null, isSignup: true
             });
         }
 
-        // 🔥 SECURITY FIX: Hash the password BEFORE putting it in the session
-        const hashedPassword = await bcrypt.hash(password, 10);
+        // 3. SERVICE CALL: Hash Password & Generate OTP
+        const hashedPassword = await AuthService.hashUserPassword(password);
+        const otp = AuthService.generateOtp();
 
-        // OTP Generation
-        const otp = Math.floor(100000 + Math.random() * 900000);
-
-        // Store safe data in session
+        // 4. Store safe data in session
         req.session.userData = {
-            firstName,
-            lastName,
-            email,
-            password: hashedPassword // Now it is securely hashed in the session
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+            email: normalizedEmail,
+            password: hashedPassword 
         };
 
-        req.session.userOtp = otp.toString();
-        // 🔥 LOGIC FIX: 2 minutes is much safer for email delivery than 30 seconds
+        req.session.userOtp = otp;
         req.session.otpExpires = Date.now() + 2 * 60 * 1000; 
 
+        // 5. Save Session and Send Email
         req.session.save(async (err) => {
             if (err) {
                 return res.render("user/loginAndSignup", {
-    title: "Signup",
-    cssFile: "loginAndSignup.css",
-    jsFile: "signupAuth.js",
-    error: "Session error",
-    success: null,
-    isSignup: true
+                    title: "Signup", cssFile: "loginAndSignup.css", jsFile: "signupAuth.js",
+                    error: "Session error", success: null, isSignup: true
                 });
             }
 
             try {
-                const response = await sendOtpEmail(email, otp);
-                if (!response || !response.messageId) {
-                    throw new Error("Email not delivered by Brevo");
-                }
+                // SERVICE CALL: Send Email via Brevo
+                await AuthService.sendVerificationEmail(normalizedEmail, otp);
                 return res.redirect("/verify-otp");
 
             } catch (emailErr) {
                 console.error("EMAIL ERROR:", emailErr);
                 return res.render("user/loginAndSignup", {
-    title: "Signup",
-    cssFile: "loginAndSignup.css",
-    jsFile: "signupAuth.js",
-    error: "OTP email failed. Please try again.",
-    success: null,
-    isSignup: true
+                    title: "Signup", cssFile: "loginAndSignup.css", jsFile: "signupAuth.js",
+                    error: "OTP email failed. Please try again.", success: null, isSignup: true
                 });
             }
         });
 
     } catch (error) {
-        console.error("signup error", error);
+        console.error("Signup error:", error);
         return res.render("user/loginAndSignup", {
-    title: "Signup",
-    cssFile: "loginAndSignup.css",
-    jsFile: "signupAuth.js",
-    error: "An unexpected error occurred",
-    success: null,
-    isSignup: true
+            title: "Signup", cssFile: "loginAndSignup.css", jsFile: "signupAuth.js",
+            error: "An unexpected error occurred", success: null, isSignup: true
         });
     }
 };
-
 // GET VERIFY OTP PAGE
 const getVerifyOtp = (req, res) => {
 
@@ -383,5 +409,6 @@ export default {
     postUserLogout,
     resendOtp,
     verifyOtp,
-    getVerifyOtp
+    getVerifyOtp,
+    googleAuthCallback
 };

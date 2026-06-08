@@ -1,37 +1,36 @@
-
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
-
-    firstName:{
-        type:String,
-        required:true,
-       
+    firstName: {
+        type: String,
+        required: true,
     },
-    lastName:{
-        type:String,
-        required:true,
-        
+    lastName: {
+        type: String,
+        // 🛠️ Made optional because some Google profiles don't have a last name
+        required: false, 
     },
-    password:{
-        type:String,
-        required:true,
-        
+    password: {
+        type: String,
+        // 🛠️ Removed required: true so Google SSO users can register passwordless
+        required: false, 
     },
-    email:{
-        type:String,
-        required:true,
-        unique:true
+    email: {
+        type: String,
+        required: true,
+        unique: true
     },
-        isBlocked: {
+    isBlocked: {
         type: Boolean,
         default: false
-    }
+    },
+    googleId: { 
+        type: String 
+    },
 },
 {
     timestamps: true
-}
-)
+});
 
-const User =  mongoose.model("UserAuthentication",userSchema)
-export default User
+const User = mongoose.model("UserAuthentication", userSchema);
+export default User;

@@ -1,10 +1,11 @@
 import dotenv from 'dotenv';
 dotenv.config();
-
 import express from 'express';
 import session from 'express-session';
+import passport from './config/passport.js'
 import path from 'path';
 import { fileURLToPath } from 'url';
+
 
 import adminRoutes from './routes/adminRoutes.js';
 import userRoutes from './routes/userRoutes.js';
@@ -46,7 +47,7 @@ app.use(
         }
     })
 );
-
+app.use(passport.initialize());
 // routes
 app.use('/admin', adminRoutes);
 app.use("/", userRoutes);
