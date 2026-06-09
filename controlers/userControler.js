@@ -1,13 +1,13 @@
-import { sendOtpEmail } from "../utils/sendOtpEmail.js";
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import AuthService from "../services/authService.js";
-const getuserIndex = (req,res)=>{
-    if(req.session.user){
-        return res.redirect("/home")
+
+const getuserIndex = (req, res) => {
+    if (req.session.user) {
+        return res.redirect("/home");
     }
-    return res.render("user/index")
-}
+    return res.render("user/index");
+};
 
 // GET LOGIN
 const getUserLogin = (req, res) => {
@@ -15,18 +15,17 @@ const getUserLogin = (req, res) => {
         return res.redirect("/home");
     }
     return res.render("user/loginAndSignup", {
-    title: "Signin",
-    cssFile: "loginAndSignup.css",
-    jsFile: "signupAuth.js",
-    error: null,
-    success: null,
-    isSignup: false
+        title: "Signin",
+        cssFile: "loginAndSignup.css",
+        jsFile: "signupAuth.js",
+        error: null,
+        success: null,
+        isSignup: false
     });
 };
 
-///signup with google
-
- const googleAuthCallback = async (req, res) => {
+// SIGNUP WITH GOOGLE
+const googleAuthCallback = async (req, res) => {
     try {
         if (!req.user) {
             return res.redirect("/login");
@@ -53,7 +52,6 @@ const getUserLogin = (req, res) => {
                 console.error("Google session save error:", err);
                 return res.redirect("/login");
             }
-
             return res.redirect("/home");
         });
 
@@ -63,76 +61,42 @@ const getUserLogin = (req, res) => {
     }
 };
 
-//LOGIN WITH FACEBOOK
+// LOGIN WITH FACEBOOK
 const facebookAuthCallback = async (req, res) => {
-
     try {
-
-        // Safety check
         if (!req.user) {
             return res.redirect("/login");
         }
 
-        // Blocked account check
         if (req.user.isBlocked) {
-
-            return res.render(
-                "user/loginAndSignup",
-                {
-                    title: "Signin",
-                    cssFile:
-                        "loginAndSignup.css",
-
-                    jsFile:
-                        "signupAuth.js",
-
-                    error:
-                        "Your account has been blocked by an admin",
-
-                    success: null,
-                    isSignup: false
-                }
-            );
+            return res.render("user/loginAndSignup", {
+                title: "Signin",
+                cssFile: "loginAndSignup.css",
+                jsFile: "signupAuth.js",
+                error: "Your account has been blocked by an admin",
+                success: null,
+                isSignup: false
+            });
         }
 
-        // Create session
         req.session.user = {
             id: req.user._id,
             email: req.user.email
         };
 
         req.session.save((err) => {
-
             if (err) {
-
-                console.error(
-                    "Facebook session save error:",
-                    err
-                );
-
-                return res.redirect(
-                    "/login"
-                );
+                console.error("Facebook session save error:", err);
+                return res.redirect("/login");
             }
-
-            return res.redirect(
-                "/home"
-            );
+            return res.redirect("/home");
         });
 
     } catch (error) {
-
-        console.error(
-            "Facebook callback error:",
-            error
-        );
-
-        return res.redirect(
-            "/login"
-        );
+        console.error("Facebook callback error:", error);
+        return res.redirect("/login");
     }
 };
-
 
 // GET SIGNUP
 const getUserSignup = (req, res) => {
@@ -140,21 +104,20 @@ const getUserSignup = (req, res) => {
         return res.redirect("/home");
     }
     return res.render("user/loginAndSignup", {
-    title: "Signup",
-    cssFile: "loginAndSignup.css",
-    jsFile: "signupAuth.js",
-    error: null,
-    success: null,
-    isSignup: true
+        title: "Signup",
+        cssFile: "loginAndSignup.css",
+        jsFile: "signupAuth.js",
+        error: null,
+        success: null,
+        isSignup: true
     });
 };
 
 // POST SIGNUP
- const postUserSignup = async (req, res) => {
+const postUserSignup = async (req, res) => {
     try {
         const { firstName, lastName, email, password, confirmPassword } = req.body;
 
-        // 1. Validate Form Inputs
         if (!firstName?.trim() || !lastName?.trim() || !email?.trim() || !password) {
             return res.render("user/loginAndSignup", {
                 title: "Signup", cssFile: "loginAndSignup.css", jsFile: "signupAuth.js",
@@ -171,7 +134,6 @@ const getUserSignup = (req, res) => {
 
         const normalizedEmail = email.trim().toLowerCase();
 
-        // 2. SERVICE CALL: Check for existing user
         const existingUser = await AuthService.checkExistingUser(normalizedEmail);
         if (existingUser) {
             return res.render("user/loginAndSignup", {
@@ -180,11 +142,9 @@ const getUserSignup = (req, res) => {
             });
         }
 
-        // 3. SERVICE CALL: Hash Password & Generate OTP
         const hashedPassword = await AuthService.hashUserPassword(password);
         const otp = AuthService.generateOtp();
 
-        // 4. Store safe data in session
         req.session.userData = {
             firstName: firstName.trim(),
             lastName: lastName.trim(),
@@ -195,7 +155,6 @@ const getUserSignup = (req, res) => {
         req.session.userOtp = otp;
         req.session.otpExpires = Date.now() + 2 * 60 * 1000; 
 
-        // 5. Save Session and Send Email
         req.session.save(async (err) => {
             if (err) {
                 return res.render("user/loginAndSignup", {
@@ -205,7 +164,7 @@ const getUserSignup = (req, res) => {
             }
 
             try {
-                // SERVICE CALL: Send Email via Brevo
+                // FIXED: Direct call via our AuthService instance
                 await AuthService.sendVerificationEmail(normalizedEmail, otp);
                 return res.redirect("/verify-otp");
 
@@ -226,9 +185,9 @@ const getUserSignup = (req, res) => {
         });
     }
 };
+
 // GET VERIFY OTP PAGE
 const getVerifyOtp = (req, res) => {
-
     if (!req.session.userOtp || !req.session.userData) {
         return res.redirect("/");
     }
@@ -245,54 +204,41 @@ const getVerifyOtp = (req, res) => {
 // VERIFY OTP
 const verifyOtp = async (req, res) => {
     try {
-
         const { otp } = req.body;
 
-        // 1. Validate session existence
         if (!req.session.userOtp || !req.session.userData) {
             return res.redirect("/login");
         }
 
-        // 2. Check OTP expiry
-        if (
-            !req.session.otpExpires ||
-            Date.now() > req.session.otpExpires
-        ) {
+        if (!req.session.otpExpires || Date.now() > req.session.otpExpires) {
             return res.render("user/verifyOtp", {
                 title: "Verify OTP",
-            cssFile: "verifyOtp.css",
-            jsFile: "verifyOtp.js",
+                cssFile: "verifyOtp.css",
+                jsFile: "verifyOtp.js",
                 error: "OTP has expired. Please resend a new one.",
                 success: null
             });
         }
 
-        // 3. Normalize OTP input
         const enteredOtp = String(otp).trim();
         const storedOtp = String(req.session.userOtp).trim();
 
-        // 4. OTP validation
         if (enteredOtp !== storedOtp) {
             return res.render("user/verifyOtp", {
                 title: "Verify OTP",
-            cssFile: "verifyOtp.css",
-            jsFile: "verifyOtp.js",
+                cssFile: "verifyOtp.css",
+                jsFile: "verifyOtp.js",
                 error: "Invalid OTP",
                 success: null
             });
         }
 
-        // 5. Validate user data
         const userData = req.session.userData;
 
-        if (
-            !userData?.email ||
-            !userData?.password
-        ) {
+        if (!userData?.email || !userData?.password) {
             return res.redirect("/login");
         }
 
-        // 6. Create user
         await User.create({
             firstName: userData.firstName,
             lastName: userData.lastName,
@@ -300,32 +246,19 @@ const verifyOtp = async (req, res) => {
             password: userData.password
         });
 
-        // 7. Destroy session
         req.session.destroy((err) => {
-            if (err) {
-                console.error(
-                    "Session destroy error:",
-                    err
-                );
-            }
+            if (err) console.error("Session destroy error:", err);
         });
 
-        // 8. Redirect after success
         return res.redirect("/login");
 
     } catch (err) {
-
-        console.error(
-            "OTP VERIFY ERROR:",
-            err
-        );
-
+        console.error("OTP VERIFY ERROR:", err);
         return res.render("user/verifyOtp", {
             title: "Verify OTP",
             cssFile: "verifyOtp.css",
             jsFile: "verifyOtp.js",
-            error:
-                "Something went wrong during verification. Try again.",
+            error: "Something went wrong during verification. Try again.",
             success: null
         });
     }
@@ -339,23 +272,15 @@ const postUserLogin = async (req, res) => {
 
         if (!user) {
             return res.render("user/loginAndSignup", {
-    title: "Signup",
-    cssFile: "loginAndSignup.css",
-    jsFile: "signupAuth.js",
-    error: "Invalid Email or Password",
-    success: null,
-    isSignup: false
+                title: "Signup", cssFile: "loginAndSignup.css", jsFile: "signupAuth.js",
+                error: "Invalid Email or Password", success: null, isSignup: false
             });
         }
 
         if (user.isBlocked) {
             return res.render("user/loginAndSignup", {
-    title: "Signup",
-    cssFile: "loginAndSignup.css",
-    jsFile: "signupAuth.js",
-    error: "Your account has been blocked by an admin",
-    success: null,
-    isSignup: false
+                title: "Signup", cssFile: "loginAndSignup.css", jsFile: "signupAuth.js",
+                error: "Your account has been blocked by an admin", success: null, isSignup: false
             });
         }
 
@@ -363,16 +288,11 @@ const postUserLogin = async (req, res) => {
 
         if (!isMatch) {
             return res.render("user/loginAndSignup", {
-    title: "Signup",
-    cssFile: "loginAndSignup.css",
-    jsFile: "signupAuth.js",
-    error: "Invalid Email or Password",
-    success: null,
-    isSignup: false
+                title: "Signup", cssFile: "loginAndSignup.css", jsFile: "signupAuth.js",
+                error: "Invalid Email or Password", success: null, isSignup: false
             });
         }
 
-        // SESSION CREATE
         req.session.user = {
             id: user._id,
             email: user.email
@@ -382,12 +302,8 @@ const postUserLogin = async (req, res) => {
             if (err) {
                 console.error(err);
                 return res.render("user/loginAndSignup", {
-    title: "Signup",
-    cssFile: "loginAndSignup.css",
-    jsFile: "signupAuth.js",
-    error: "Session Error",
-    success: null,
-    isSignup: false
+                    title: "Signup", cssFile: "loginAndSignup.css", jsFile: "signupAuth.js",
+                    error: "Session Error", success: null, isSignup: false
                 });
             }
             return res.redirect("/home");
@@ -396,12 +312,8 @@ const postUserLogin = async (req, res) => {
     } catch (error) {
         console.error(error);
         return res.render("user/loginAndSignup", {
-    title: "Signup",
-    cssFile: "loginAndSignup.css",
-    jsFile: "signupAuth.js",
-    error: "Login Failed",
-    success: null,
-    isSignup: false
+            title: "Signup", cssFile: "loginAndSignup.css", jsFile: "signupAuth.js",
+            error: "Login Failed", success: null, isSignup: false
         });
     }
 };
@@ -412,9 +324,9 @@ const getHome = (req, res) => {
         return res.redirect("/");
     }
     return res.render("user/home", {
-    title: "home",
-    cssFile: "home.css",
-    user: req.session.user
+        title: "home",
+        cssFile: "home.css",
+        user: req.session.user
     });
 };
 
@@ -427,10 +339,10 @@ const resendOtp = async (req, res) => {
             return res.redirect("/");
         }
 
-        const otp = Math.floor(100000 + Math.random() * 900000);
+        // FIXED: Using central generateOtp tool
+        const otp = AuthService.generateOtp();
 
-        req.session.userOtp = otp.toString();
-        // 🔥 LOGIC FIX: Match the new 2-minute timer
+        req.session.userOtp = otp;
         req.session.otpExpires = Date.now() + 2 * 60 * 1000; 
 
         await new Promise((resolve, reject) => {
@@ -440,7 +352,8 @@ const resendOtp = async (req, res) => {
             });
         });
 
-        await sendOtpEmail(userData.email, otp);
+        // FIXED: Passing parameters into the central AuthService flow
+        await AuthService.sendVerificationEmail(userData.email, otp);
 
         return res.render("user/verifyOtp", {
             title: "Verify OTP",
@@ -459,6 +372,160 @@ const resendOtp = async (req, res) => {
             error: "Failed to resend OTP",
             success: null
         });
+    }
+};
+
+// 1. Show the "Enter your email" page
+const getForgotPassword = (req, res) => {
+    return res.render("user/forgotPassword", {
+        title: "Forgot Password",
+        cssFile: "loginAndSignup.css",
+        error: null,
+        success:null
+    });
+};
+
+// POST FORGOT PASSWORD
+const postForgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        const user = await User.findOne({
+            email: email.trim().toLowerCase()
+        });
+
+        if (!user) {
+            return res.render("user/forgotPassword", {
+                title: "Forgot Password",
+                cssFile: "loginAndSignup.css",
+                error: "Email not found",
+                success:null
+
+            });
+        }
+
+        // FIXED: Unified implementation through AuthService
+        const otp = AuthService.generateOtp();
+
+        req.session.forgotEmail = user.email;
+        req.session.forgotOtp = otp;
+        req.session.forgotOtpExpires = Date.now() + 2 * 60 * 1000;
+
+        // FIXED: Routing email distribution logic through the modern service layer
+        await AuthService.sendPasswordResetOtp(user.email, otp);
+
+        return res.redirect("/verify-forgot-otp");
+
+    } catch (error) {
+        console.error(error);
+        return res.redirect("/forgot-password");
+    }
+};
+
+// GET FORGOT OTP PAGE
+const getForgotOtpPage = (req, res) => {
+    if (!req.session.forgotOtp) {
+        return res.redirect("/forgot-password");
+    }
+
+    return res.render("user/verifyForgotOtp", {
+        title: "Verify OTP",
+        cssFile: "verifyOtp.css",
+        jsFile: "verifyOtp.js",
+        error: null,
+        success: null
+    });
+};
+
+// VERIFY FORGOT OTP
+const verifyForgotOtp = async (req, res) => {
+    try {
+        const { otp } = req.body;
+
+        if (!req.session.forgotOtp) {
+            return res.redirect("/forgot-password");
+        }
+
+        if (Date.now() > req.session.forgotOtpExpires) {
+            return res.render("user/verifyForgotOtp", {
+                title: "Verify OTP",
+                cssFile: "verifyOtp.css",
+                error: "OTP expired",
+                success: null
+            });
+        }
+
+        const enteredOtp = String(otp).trim();
+        const storedOtp = String(req.session.forgotOtp).trim();
+
+        if (enteredOtp !== storedOtp) {
+            return res.render("user/verifyForgotOtp", {
+                title: "Verify OTP",
+                cssFile: "verifyOtp.css",
+                error: "Invalid OTP",
+                success: null
+            });
+        }
+
+        req.session.otpVerified = true;
+        return res.redirect("/reset-password");
+
+    } catch (error) {
+        console.error(error);
+        return res.redirect("/forgot-password");
+    }
+};
+
+// GET RESET PASSWORD
+const getResetPassword = (req, res) => {
+    if (!req.session.otpVerified) {
+        return res.redirect("/forgot-password");
+    }
+
+    return res.render("user/resetPassword", {
+        title: "Reset Password",
+        cssFile: "loginAndSignup.css",
+        error: null
+    });
+};
+
+// POST RESET PASSWORD
+const postResetPassword = async (req, res) => {
+    try {
+        const { password, confirmPassword } = req.body;
+
+        if (password !== confirmPassword) {
+            return res.render("user/resetPassword", {
+                title: "Reset Password",
+                cssFile: "loginAndSignup.css",
+                error: "Passwords do not match"
+            });
+        }
+
+        const email = req.session.forgotEmail;
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.redirect("/forgot-password");
+        }
+
+        // FIXED: Leveraging the AuthService hashing mechanism 
+        const hashedPassword = await AuthService.hashUserPassword(password);
+
+        user.password = hashedPassword;
+        await user.save();
+
+        // Clear password reset session data cleanly
+        delete req.session.forgotEmail;
+        delete req.session.forgotOtp;
+        delete req.session.forgotOtpExpires;
+        delete req.session.otpVerified;
+
+        return res.redirect("/login");
+
+    } catch (error) {
+        console.error(error);
+        return res.redirect("/forgot-password");
     }
 };
 
@@ -481,5 +548,11 @@ export default {
     verifyOtp,
     getVerifyOtp,
     googleAuthCallback,
-    facebookAuthCallback
+    facebookAuthCallback,
+    getForgotPassword,
+    postForgotPassword,
+    getForgotOtpPage,
+    verifyForgotOtp,
+    getResetPassword,
+    postResetPassword
 };

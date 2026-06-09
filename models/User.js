@@ -33,6 +33,15 @@ facebookId: {
     unique: true,
     sparse: true // Allows multiple users to not have a facebookId
 },
+// Add inside your User schema:
+resetPasswordToken: {
+    type: String,
+    default: null
+},
+resetPasswordExpires: {
+    type: Date,
+    default: null
+},
 },
 {
     timestamps: true

@@ -55,5 +55,64 @@ router.get("/auth/facebook/callback",
     userController.facebookAuthCallback
 );
 
+// ================= FORGOT PASSWORD =================
 
+// Forgot password page
+router.get(
+    "/forgot-password",
+
+    disableCache,
+
+    userController
+        .getForgotPassword
+);
+
+
+// Send OTP
+router.post(
+    "/forgot-password",
+
+    userController
+        .postForgotPassword
+);
+
+
+// Verify forgot OTP page
+router.get(
+    "/verify-forgot-otp",
+
+    disableCache,
+
+    userController
+        .getForgotOtpPage
+);
+
+
+// Verify OTP
+router.post(
+    "/verify-forgot-otp",
+
+    userController
+        .verifyForgotOtp
+);
+
+
+// Reset password page
+router.get(
+    "/reset-password",
+
+    disableCache,
+
+    userController
+        .getResetPassword
+);
+
+
+// Save new password
+router.post(
+    "/reset-password",
+
+    userController
+        .postResetPassword
+);
 export default router;
