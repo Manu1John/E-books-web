@@ -1,68 +1,74 @@
 
     const editBtn =
-        document.getElementById(
-            "editBtn"
-        );
-
-    const fields =
-        document.querySelectorAll(
-            ".info-card input[name], .info-card textarea"
-        );
+        document.getElementById("editBtn");
 
     const changePhotoBtn =
         document.getElementById(
             "changePhotoBtn"
         );
 
-    const imageInput =
+    const profileImage =
         document.getElementById(
             "profileImage"
         );
 
-    const form =
-        document.querySelector(
-            ".info-card"
+    const previewImage =
+        document.getElementById(
+            "previewImage"
         );
 
-    let editing = false;
+    // ALL editable fields
+    const fields =
+        document.querySelectorAll(
+            'input[name="firstName"], input[name="lastName"], input[name="phone"], textarea[name="address"]'
+        );
+
+    let editMode = false;
 
     editBtn.addEventListener(
         "click",
-        () => {
+        function () {
 
-            if (!editing) {
+            // SAVE MODE
+            if (editMode) {
 
-                fields.forEach(
-                    field => {
-                        field.disabled = false;
-                    }
-                );
+                document
+                    .querySelector(
+                        ".info-card"
+                    )
+                    .submit();
 
-                changePhotoBtn.disabled =
-                    false;
-
-                editBtn.textContent =
-                    "Save";
-
-                editing = true;
-
-            } else {
-
-                form.submit();
+                return;
             }
+
+            // EDIT MODE
+            fields.forEach(
+                field => {
+                    field.disabled = false;
+                }
+            );
+
+            changePhotoBtn.disabled =
+                false;
+
+            editBtn.textContent =
+                "Save";
+
+            editMode = true;
         }
     );
 
+    // Open image picker
     changePhotoBtn
         .addEventListener(
             "click",
             () => {
-
-                imageInput.click();
+                profileImage.click();
             }
         );
 
-    imageInput
+    // Preview selected image
+    profileImage
         .addEventListener(
             "change",
             function () {
@@ -72,11 +78,7 @@
 
                 if (file) {
 
-                    document
-                        .getElementById(
-                            "previewImage"
-                        )
-                        .src =
+                    previewImage.src =
                         URL.createObjectURL(
                             file
                         );

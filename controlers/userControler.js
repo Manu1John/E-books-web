@@ -607,6 +607,54 @@ const postResetPassword = async (req, res) => {
     }
 };
 
+const updateUserProfile =
+async (req, res) => {
+
+    try {
+
+        const userId =
+        req.session.user.id;
+
+        const {
+            firstName,
+            lastName,
+            phone
+        } = req.body;
+
+        const updateData = {
+
+            firstName,
+            lastName,
+            phone
+        };
+
+        // image upload
+        if (req.file) {
+
+            updateData.profileImage =
+                "/uploads/" +
+                req.file.filename;
+        }
+
+        await User.findByIdAndUpdate(
+            userId,
+            updateData
+        );
+
+        return res.redirect(
+            "/user-profile"
+        );
+
+    } catch (error) {
+
+        console.log(error);
+
+        return res.redirect(
+            "/user-profile"
+        );
+    }
+};
+
 // LOGOUT
 const postUserLogout = (req, res) => {
     delete req.session.user;
@@ -634,5 +682,6 @@ export default {
     getResetPassword,
     postResetPassword,
     resendForgotOtp,
-    getUserProfile
+    getUserProfile,
+    updateUserProfile
 };

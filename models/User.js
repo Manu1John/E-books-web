@@ -42,6 +42,15 @@ resetPasswordExpires: {
     type: Date,
     default: null
 },
+    phone: {
+        type: String,
+        default: ""
+    },
+
+    profileImage: {
+        type: String,
+        default: ""
+    },
 },
 {
     timestamps: true

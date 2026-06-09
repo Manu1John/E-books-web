@@ -1,5 +1,7 @@
 import passport from "passport";
 import express from "express";
+
+import upload from "../config/multer.js";
 import {
     authenticatedUser,
     disableCache,
@@ -121,4 +123,6 @@ router.post(
 
 // Resend Forgot Password OTP
 router.post("/resend-forgot-otp", disableCache, userController.resendForgotOtp);
+router.post("/update-profile",upload.single("profileImage"),userController.updateUserProfile);
+
 export default router;
