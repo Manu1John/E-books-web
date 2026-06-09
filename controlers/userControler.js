@@ -4,25 +4,45 @@ import bcrypt from "bcrypt";
 import AuthService from "../services/authService.js";
 
 const getuserIndex = (req, res) => {
-    if (req.session.user) {
-        return res.redirect("/home");
+    try {
+
+        if (req.session.user) {
+            return res.redirect("/home");
+        }
+
+        return res.render("user/index");
+
+    } catch (error) {
+
+        console.log("GET USER INDEX ERROR:", error);
+
+        return res.redirect("/");
     }
-    return res.render("user/index");
 };
 
 // GET LOGIN
 const getUserLogin = (req, res) => {
-    if (req.session.user) {
-        return res.redirect("/home");
+    try {
+
+        if (req.session.user) {
+            return res.redirect("/home");
+        }
+
+        return res.render("user/loginAndSignup", {
+            title: "Signin",
+            cssFile: "loginAndSignup.css",
+            jsFile: "signupAuth.js",
+            error: null,
+            success: null,
+            isSignup: false
+        });
+
+    } catch (error) {
+
+        console.log("GET USER LOGIN ERROR:", error);
+
+        return res.redirect("/");
     }
-    return res.render("user/loginAndSignup", {
-        title: "Signin",
-        cssFile: "loginAndSignup.css",
-        jsFile: "signupAuth.js",
-        error: null,
-        success: null,
-        isSignup: false
-    });
 };
 
 // SIGNUP WITH GOOGLE
@@ -100,20 +120,29 @@ const facebookAuthCallback = async (req, res) => {
 };
 
 // GET SIGNUP
-const getUserSignup = (req, res) => {
-    if (req.session.user) {
-        return res.redirect("/home");
-    }
-    return res.render("user/loginAndSignup", {
-        title: "Signup",
-        cssFile: "loginAndSignup.css",
-        jsFile: "signupAuth.js",
-        error: null,
-        success: null,
-        isSignup: true
-    });
-};
+const getUserSignup = (req, res, next) => {
+    try {
+        // Safe check: Ensures req.session exists before looking for 'user'
+        if (req.session?.user) {
+            return res.redirect("/home");
+        }
 
+        return res.render("user/loginAndSignup", {
+            title: "Signup",
+            cssFile: "loginAndSignup.css",
+            jsFile: "signupAuth.js",
+            error: null,
+            success: null,
+            isSignup: true
+        });
+    } catch (error) {
+        // Log the actual error for debugging purposes
+        console.error("Error in getUserSignup controller:", error);
+        
+        // Pass the error to Express's central error-handling middleware
+        next(error);
+    }
+};
 // POST SIGNUP
 const postUserSignup = async (req, res) => {
     try {
@@ -188,20 +217,28 @@ const postUserSignup = async (req, res) => {
 };
 
 // GET VERIFY OTP PAGE
-const getVerifyOtp = (req, res) => {
-    if (!req.session.userOtp || !req.session.userData) {
-        return res.redirect("/");
+const getVerifyOtp = (req, res, next) => {
+    try {
+        // Safe check: Using optional chaining (?.) prevents crashes if the session is uninitialized
+        if (!req.session?.userOtp || !req.session?.userData) {
+            return res.redirect("/");
+        }
+
+        return res.render("user/verifyOtp", {
+            title: "Verify OTP",
+            cssFile: "verifyOtp.css",
+            jsFile: "verifyOtp.js",
+            error: null,
+            success: null
+        });
+    } catch (error) {
+        // Log the error for server-side debugging
+        console.error("Error in getVerifyOtp controller:", error);
+        
+        // Forward the error to your central Express error-handling middleware
+        next(error);
     }
-
-    return res.render("user/verifyOtp", {
-        title: "Verify OTP",
-        cssFile: "verifyOtp.css",
-        jsFile: "verifyOtp.js",
-        error: null,
-        success: null
-    });
 };
-
 // VERIFY OTP
 const verifyOtp = async (req, res) => {
     try {
@@ -320,16 +357,25 @@ const postUserLogin = async (req, res) => {
 };
 
 // HOME
-const getHome = (req, res) => {
-    if (!req.session.user) {
-        return res.redirect("/");
+const getHome = (req, res, next) => {
+    try {
+        // Safe check: Optional chaining prevents crashes if the session is uninitialized
+        if (!req.session?.user) {
+            return res.redirect("/");
+        }
+        
+        return res.render("user/home", {
+            title: "home",
+            cssFile: "home.css",
+            user: req.session.user // Safe to use here because the check above passed
+        });
+    } catch (error) {
+        // Log the error for server-side debugging
+        console.error("Error in getHome controller:", error);
+        
+        // Forward the error to your central Express error-handling middleware
+        next(error);
     }
-    
-    return res.render("user/home", {
-        title: "home",
-        cssFile: "home.css",
-        user: req.session.user
-    });
 };
 
 const getUserProfile = async (req, res) => {
@@ -408,13 +454,21 @@ const resendOtp = async (req, res) => {
 };
 
 // 1. Show the "Enter your email" page
-const getForgotPassword = (req, res) => {
-    return res.render("user/forgotPassword", {
-        title: "Forgot Password",
-        cssFile: "loginAndSignup.css",
-        error: null,
-        success:null
-    });
+const getForgotPassword = (req, res, next) => {
+    try {
+        return res.render("user/forgotPassword", {
+            title: "Forgot Password",
+            cssFile: "loginAndSignup.css",
+            error: null,
+            success: null
+        });
+    } catch (error) {
+        // Log the error for server-side debugging
+        console.error("Error in getForgotPassword controller:", error);
+        
+        // Forward the error to your central Express error-handling middleware
+        next(error);
+    }
 };
 
 // POST FORGOT PASSWORD
@@ -455,20 +509,28 @@ const postForgotPassword = async (req, res) => {
 };
 
 // GET FORGOT OTP PAGE
-const getForgotOtpPage = (req, res) => {
-    if (!req.session.forgotOtp) {
-        return res.redirect("/forgot-password");
+const getForgotOtpPage = (req, res, next) => {
+    try {
+        // Safe check: Optional chaining prevents crashes if the session is uninitialized
+        if (!req.session?.forgotOtp) {
+            return res.redirect("/forgot-password");
+        }
+
+        return res.render("user/verifyForgotOtp", {
+            title: "Verify OTP",
+            cssFile: "verifyOtp.css",
+            jsFile: "verifyOtp.js",
+            error: null,
+            success: null
+        });
+    } catch (error) {
+        // Log the error for server-side debugging
+        console.error("Error in getForgotOtpPage controller:", error);
+        
+        // Forward the error to your central Express error-handling middleware
+        next(error);
     }
-
-    return res.render("user/verifyForgotOtp", {
-        title: "Verify OTP",
-        cssFile: "verifyOtp.css",
-        jsFile: "verifyOtp.js",
-        error: null,
-        success: null
-    });
 };
-
 // VERIFY FORGOT OTP
 const verifyForgotOtp = async (req, res) => {
     try {
@@ -510,16 +572,25 @@ const verifyForgotOtp = async (req, res) => {
 };
 
 // GET RESET PASSWORD
-const getResetPassword = (req, res) => {
-    if (!req.session.otpVerified) {
-        return res.redirect("/forgot-password");
-    }
+const getResetPassword = (req, res, next) => {
+    try {
+        // Safe check: Optional chaining prevents crashes if the session is uninitialized
+        if (!req.session?.otpVerified) {
+            return res.redirect("/forgot-password");
+        }
 
-    return res.render("user/resetPassword", {
-        title: "Reset Password",
-        cssFile: "loginAndSignup.css",
-        error: null
-    });
+        return res.render("user/resetPassword", {
+            title: "Reset Password",
+            cssFile: "loginAndSignup.css",
+            error: null
+        });
+    } catch (error) {
+        // Log the error for server-side debugging
+        console.error("Error in getResetPassword controller:", error);
+        
+        // Forward the error to your central Express error-handling middleware
+        next(error);
+    }
 };
 // RESEND FORGOT PASSWORD OTP  
 const resendForgotOtp = async (req, res) => {
@@ -696,24 +767,22 @@ const getAddressPage = async (req, res) => {
     }
 };
 
-const getAddAddressPage =
-(req, res) => {
-
-    return res.render(
-        "user/addAddress",
-        {
-            title:
-            "Add Address",
-
-            cssFile:
-            "addAddress.css",
-
-            user:
-            req.session.user
-        }
-    );
+const getAddAddressPage = (req, res, next) => {
+    try {
+        return res.render("user/addAddress", {
+            title: "Add Address",
+            cssFile: "addAddress.css",
+            // Safe check: Prevents crashing if req.session is undefined
+            user: req.session?.user 
+        });
+    } catch (error) {
+        // Log the error for server-side debugging
+        console.error("Error in getAddAddressPage controller:", error);
+        
+        // Forward the error to your central Express error-handling middleware
+        next(error);
+    }
 };
-
 // ADD ADDRESS
 const addAddress = async (req, res) => {
     try {
@@ -853,12 +922,25 @@ async (req, res) => {
 };
 
 // LOGOUT
-const postUserLogout = (req, res) => {
-    delete req.session.user;
-    res.clearCookie("connect.sid");
-    return res.redirect("/");
-};
+const postUserLogout = (req, res, next) => {
+    try {
+        // Safe check: Ensure session exists before attempting to delete a property
+        if (req.session) {
+            delete req.session.user;
+        }
 
+        // Clear the session cookie from the user's browser
+        res.clearCookie("connect.sid");
+        
+        return res.redirect("/");
+    } catch (error) {
+        // Log the error for server-side debugging
+        console.error("Error in postUserLogout controller:", error);
+        
+        // Forward the error to your central Express error-handling middleware
+        next(error);
+    }
+};
 export default {
     getuserIndex,
     getUserLogin,
@@ -872,7 +954,6 @@ export default {
     getVerifyOtp,
     googleAuthCallback,
     facebookAuthCallback,
-
     // FORGOT PASSWORD
     getForgotPassword,
     postForgotPassword,
@@ -881,11 +962,9 @@ export default {
     getResetPassword,
     resendForgotOtp,
     postResetPassword,
-
     // USER PROFILE
     getUserProfile,
     updateUserProfile,
-
     // ADDRESS
     getAddressPage,
     getAddAddressPage,
