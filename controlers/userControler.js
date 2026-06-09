@@ -323,6 +323,7 @@ const getHome = (req, res) => {
     if (!req.session.user) {
         return res.redirect("/");
     }
+    
     return res.render("user/home", {
         title: "home",
         cssFile: "home.css",
@@ -330,6 +331,36 @@ const getHome = (req, res) => {
     });
 };
 
+const getUserProfile = async (req, res) => {
+
+    try {
+
+        if (!req.session.user) {
+            return res.redirect("/");
+        }
+
+        // get full user data from database
+        const user = await User.findById(
+            req.session.user.id
+        );
+
+        return res.render(
+            "user/userProfile",
+            {
+                title: "User Profile",
+                cssFile: "userProfile.css",
+                jsFile:"userProfile.js",
+                user
+            }
+        );
+
+    } catch (error) {
+
+        console.log(error);
+
+        return res.redirect("/");
+    }
+};
 // RESEND OTP  
 const resendOtp = async (req, res) => {
     try {
@@ -602,5 +633,6 @@ export default {
     verifyForgotOtp,
     getResetPassword,
     postResetPassword,
-    resendForgotOtp
+    resendForgotOtp,
+    getUserProfile
 };

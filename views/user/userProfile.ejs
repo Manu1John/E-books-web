@@ -1,0 +1,310 @@
+```ejs
+<%- include('../partials/header') %>
+
+<!-- HEADER -->
+<header class="top-header">
+
+    <div class="social-icons">
+        <i class="fab fa-facebook-f"></i>
+        <i class="fab fa-twitter"></i>
+        <i class="fab fa-pinterest"></i>
+        <i class="fab fa-instagram"></i>
+    </div>
+
+    <div class="header-right">
+        <a href="#">Login</a>
+        <a href="#">Account</a>
+
+        <i class="fa-solid fa-heart"></i>
+        <i class="fa-solid fa-magnifying-glass"></i>
+    </div>
+
+</header>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+
+    <div class="logo">
+        Lantern & Leaf
+    </div>
+
+    <ul class="nav-links">
+        <li><a href="/home">Home</a></li>
+        <li><a href="#">Featured</a></li>
+        <li><a href="#">Popular</a></li>
+        <li><a href="#">Offer</a></li>
+        <li><a href="#">Articles</a></li>
+    </ul>
+
+</nav>
+
+<!-- PROFILE SECTION -->
+<section class="profile-section">
+
+    <h1 class="page-title">
+        MY PROFILE
+    </h1>
+
+    <div class="profile-container">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <div class="profile-card">
+
+                <img
+                    src="<%= user.profileImage || 'https://i.pravatar.cc/150' %>"
+                    alt="profile"
+                />
+
+                <h3>
+                    <%= user.firstName %>
+                    <%= user.lastName %>
+                </h3>
+
+            </div>
+
+            <button>Profile Overview</button>
+            <button>My Orders</button>
+            <button>Order Details</button>
+            <button>Wishlist</button>
+            <button>Wallet</button>
+            <button>Add Address</button>
+            <button>Logout</button>
+
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <div class="profile-content">
+
+            <!-- STATS -->
+            <div class="stats-box">
+
+                <div class="stat">
+                    <h2>24</h2>
+                    <p>Books Ordered</p>
+                </div>
+
+                <div class="stat">
+                    <h2>08</h2>
+                    <p>Wishlist Items</p>
+                </div>
+
+                <div class="stat">
+                    <h2>04</h2>
+                    <p>Reviews Posted</p>
+                </div>
+
+            </div>
+
+            <!-- PERSONAL INFO -->
+            <form
+                action="/update-profile"
+                method="POST"
+                enctype="multipart/form-data"
+                class="info-card"
+            >
+
+                <h2>
+                    Personal Information
+                </h2>
+
+                <!-- Profile Upload -->
+                <div class="profile-upload">
+
+                    <img
+                        id="previewImage"
+                        src="<%= user.profileImage || 'https://i.pravatar.cc/150' %>"
+                        alt="profile"
+                        class="profile-preview"
+                    />
+
+                    <input
+                        type="file"
+                        name="profileImage"
+                        id="profileImage"
+                        hidden
+                    />
+
+                    <button
+                        type="button"
+                        id="changePhotoBtn"
+                        class="change-photo-btn"
+                        disabled
+                    >
+                        Change Photo
+                    </button>
+
+                </div>
+
+                <div class="form-grid">
+
+                    <div>
+                        <label>
+                            First Name
+                        </label>
+
+                        <input
+                            type="text"
+                            name="firstName"
+                            value="<%= user.firstName %>"
+                            disabled
+                        />
+                    </div>
+
+                    <div>
+                        <label>
+                            Last Name
+                        </label>
+
+                        <input
+                            type="text"
+                            name="lastName"
+                            value="<%= user.lastName %>"
+                            disabled
+                        />
+                    </div>
+
+                    <div>
+                        <label>
+                            Email Address
+                        </label>
+
+                        <input
+                            type="email"
+                            value="<%= user.email %>"
+                            disabled
+                        />
+                    </div>
+
+                    <div>
+                        <label>
+                            Phone Number
+                        </label>
+
+                        <input
+                            type="text"
+                            name="phone"
+                            value="<%= user.phone || '' %>"
+                            disabled
+                        />
+                    </div>
+
+                </div>
+
+                <div class="full-width">
+
+                    <label>
+                        Address
+                    </label>
+
+                    <textarea
+                        name="address"
+                        disabled
+                    ><%= user.address || '' %></textarea>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="save-btn"
+                    id="editBtn"
+                >
+                    Edit
+                </button>
+
+            </form>
+
+            <!-- PASSWORD & EMAIL -->
+            <div class="bottom-grid">
+
+                <!-- PASSWORD -->
+                <div class="card">
+
+                    <h2>
+                        Change Password
+                    </h2>
+
+                    <input
+                        type="password"
+                        placeholder="Current password"
+                        disabled
+                    />
+
+                    <div class="two-col">
+
+                        <input
+                            type="password"
+                            placeholder="New password"
+                            disabled
+                        />
+
+                        <input
+                            type="password"
+                            placeholder="Confirm password"
+                            disabled
+                        />
+
+                    </div>
+
+                    <button disabled>
+                        UPDATE PASSWORD
+                    </button>
+
+                </div>
+
+                <!-- EMAIL -->
+                <div class="card">
+
+                    <h2>
+                        Change Email
+                    </h2>
+
+                    <input
+                        type="email"
+                        placeholder="Current email"
+                        disabled
+                    />
+
+                    <input
+                        type="email"
+                        placeholder="New email"
+                        disabled
+                    />
+
+                    <button disabled>
+                        Send OTP
+                    </button>
+
+                    <div class="otp-box">
+
+                        <input maxlength="1" disabled>
+                        <input maxlength="1" disabled>
+                        <input maxlength="1" disabled>
+                        <input maxlength="1" disabled>
+                        <input maxlength="1" disabled>
+                        <input maxlength="1" disabled>
+
+                    </div>
+
+                    <button disabled>
+                        Verify & Update Email
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+
+
+
+<%- include('../partials/footer') %>
+```

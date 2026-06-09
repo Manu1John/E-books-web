@@ -28,6 +28,9 @@ router.post("/resend-otp", disableCache, userController.resendOtp);
 
 // HOME
 router.get("/home",authenticatedUser,disableCache,userController.getHome);
+//USER PROFILE
+router.get("/user-profile",authenticatedUser,disableCache,userController.getUserProfile);
+
 // LOGOUT
 router.post("/logout",disableCache,userController.postUserLogout);
 
