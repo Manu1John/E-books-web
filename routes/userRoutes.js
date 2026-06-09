@@ -115,4 +115,7 @@ router.post(
     userController
         .postResetPassword
 );
+
+// Resend Forgot Password OTP
+router.post("/resend-forgot-otp", disableCache, userController.resendForgotOtp);
 export default router;

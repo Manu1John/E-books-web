@@ -450,8 +450,9 @@ const verifyForgotOtp = async (req, res) => {
             return res.render("user/verifyForgotOtp", {
                 title: "Verify OTP",
                 cssFile: "verifyOtp.css",
+                jsFile: "verifyOtp.js",
                 error: "OTP expired",
-                success: null
+                success: ""
             });
         }
 
@@ -487,6 +488,52 @@ const getResetPassword = (req, res) => {
         cssFile: "loginAndSignup.css",
         error: null
     });
+};
+// RESEND FORGOT PASSWORD OTP  
+const resendForgotOtp = async (req, res) => {
+    try {
+        const email = req.session.forgotEmail;
+
+        if (!email) {
+            return res.redirect("/forgot-password");
+        }
+
+        // Generate a new OTP using your central AuthService
+        const otp = AuthService.generateOtp();
+
+        // Update session with new OTP and extend the 2-minute expiration window
+        req.session.forgotOtp = otp;
+        req.session.forgotOtpExpires = Date.now() + 2 * 60 * 1000; 
+
+        // Force save session before sending the email to avoid race conditions
+        await new Promise((resolve, reject) => {
+            req.session.save((err) => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+
+        // Send the new OTP using your Brevo service
+        await AuthService.sendPasswordResetOtp(email, otp);
+
+        return res.render("user/verifyForgotOtp", {
+            title: "Verify OTP",
+            cssFile: "verifyOtp.css",
+            jsFile: "verifyOtp.js",
+            error: null,
+            success: "A fresh OTP has been sent to your email."
+        });
+
+    } catch (error) {
+        console.error("RESEND FORGOT OTP ERROR:", error);
+        return res.render("user/verifyForgotOtp", {
+            title: "Verify OTP",
+            cssFile: "verifyOtp.css",
+            jsFile: "verifyOtp.js",
+            error: "Failed to resend OTP. Please try again.",
+            success: null
+        });
+    }
 };
 
 // POST RESET PASSWORD
@@ -554,5 +601,6 @@ export default {
     getForgotOtpPage,
     verifyForgotOtp,
     getResetPassword,
-    postResetPassword
+    postResetPassword,
+    resendForgotOtp
 };
