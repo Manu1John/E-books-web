@@ -63,66 +63,29 @@ router.get("/auth/facebook/callback",
 // ================= FORGOT PASSWORD =================
 
 // Forgot password page
-router.get(
-    "/forgot-password",
-
-    disableCache,
-
-    userController
-        .getForgotPassword
-);
-
-
+router.get("/forgot-password",disableCache,userController.getForgotPassword);
 // Send OTP
-router.post(
-    "/forgot-password",
-
-    userController
-        .postForgotPassword
-);
-
-
+router.post("/forgot-password",userController.postForgotPassword);
 // Verify forgot OTP page
-router.get(
-    "/verify-forgot-otp",
-
-    disableCache,
-
-    userController
-        .getForgotOtpPage
-);
-
-
+router.get("/verify-forgot-otp",disableCache,userController.getForgotOtpPage);
 // Verify OTP
-router.post(
-    "/verify-forgot-otp",
-
-    userController
-        .verifyForgotOtp
-);
-
-
+router.post("/verify-forgot-otp",userController.verifyForgotOtp);
 // Reset password page
-router.get(
-    "/reset-password",
-
-    disableCache,
-
-    userController
-        .getResetPassword
-);
-
-
+router.get("/reset-password",disableCache,userController.getResetPassword);
 // Save new password
-router.post(
-    "/reset-password",
-
-    userController
-        .postResetPassword
-);
-
+router.post("/reset-password",userController.postResetPassword);
 // Resend Forgot Password OTP
 router.post("/resend-forgot-otp", disableCache, userController.resendForgotOtp);
 router.post("/update-profile",upload.single("profileImage"),userController.updateUserProfile);
+//ADDRESS PAGE
+router.get("/address",authenticatedUser,userController.getAddressPage)
+router.get("/add-address",authenticatedUser,userController.getAddAddressPage);
+// ADD ADDRESS
+router.post("/add-address",authenticatedUser,userController.addAddress);
+// EDIT ADDRESS
+router.get( "/edit-address/:id", authenticatedUser, userController.getEditAddress );
+router.post("/edit-address/:id",authenticatedUser,userController.updateAddress);
+// DELETE ADDRESS
+router.post("/delete-address/:id",authenticatedUser,userController.deleteAddress);
 
 export default router;

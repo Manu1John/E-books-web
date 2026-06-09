@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import Address from "../models/address.js";
 import bcrypt from "bcrypt";
 import AuthService from "../services/authService.js";
 
@@ -655,6 +656,202 @@ async (req, res) => {
     }
 };
 
+// ADDRESS PAGE
+const getAddressPage = async (req, res) => {
+
+    try {
+
+        const userId =
+            req.session.user.id;
+            
+
+        const addresses =
+            await Address.find({
+                userId
+            });
+
+        res.render(
+            "user/address",
+            {
+                title:
+                    "Saved Address",
+
+                cssFile:
+                    "address.css",
+
+                user:
+                    req.session.user,
+
+                addresses
+            }
+        );
+
+    } catch (error) {
+
+        console.log(error);
+
+        res.redirect(
+            "/user-profile"
+        );
+    }
+};
+
+const getAddAddressPage =
+(req, res) => {
+
+    return res.render(
+        "user/addAddress",
+        {
+            title:
+            "Add Address",
+
+            cssFile:
+            "addAddress.css",
+
+            user:
+            req.session.user
+        }
+    );
+};
+
+// ADD ADDRESS
+const addAddress = async (req, res) => {
+    try {
+
+        const userId = req.session.user.id;
+
+        const {
+            fullName,
+            phone,
+            house,
+            area,
+            landmark,
+            city,
+            state,
+            pincode,
+            addressType
+        } = req.body;
+
+        await Address.create({
+            userId,
+
+            fullName,
+
+            phone,
+
+            addressLine: `${house}, ${area}`,
+
+            landmark,
+
+            city,
+
+            state,
+
+            pincode,
+
+            addressType
+        });
+
+        return res.redirect("/address");
+
+    } catch (error) {
+
+        console.log("ADD ADDRESS ERROR:", error);
+
+        return res.redirect("/add-address");
+    }
+};
+
+// GET EDIT ADDRESS PAGE
+const getEditAddress = async (req, res) => {
+    try {
+
+        const address = await Address.findById(req.params.id);
+
+        if (!address) {
+            return res.redirect("/address");
+        }
+
+        return res.render("user/editAddress", {
+            title: "Edit Address",
+            cssFile: "addAddress.css",
+            address
+        });
+
+    } catch (error) {
+
+        console.log(error);
+        return res.redirect("/address");
+    }
+};
+
+
+// UPDATE ADDRESS
+const updateAddress = async (req, res) => {
+    try {
+
+        const {
+            fullName,
+            phone,
+            house,
+            area,
+            landmark,
+            city,
+            state,
+            pincode,
+            addressType
+        } = req.body;
+
+        await Address.findByIdAndUpdate(
+            req.params.id,
+            {
+                fullName,
+                phone,
+                addressLine: `${house}, ${area}`,
+                landmark,
+                city,
+                state,
+                pincode,
+                addressType
+            }
+        );
+
+        return res.redirect("/address");
+
+    } catch (error) {
+
+        console.log(error);
+        return res.redirect("/address");
+    }
+};
+
+
+
+
+// DELETE ADDRESS
+const deleteAddress =
+async (req, res) => {
+
+    try {
+
+        await Address.findByIdAndDelete(
+            req.params.id
+        );
+
+        res.redirect(
+            "/address"
+        );
+
+    } catch (error) {
+
+        console.log(error);
+
+        res.redirect(
+            "/address"
+        );
+    }
+};
+
 // LOGOUT
 const postUserLogout = (req, res) => {
     delete req.session.user;
@@ -675,13 +872,25 @@ export default {
     getVerifyOtp,
     googleAuthCallback,
     facebookAuthCallback,
+
+    // FORGOT PASSWORD
     getForgotPassword,
     postForgotPassword,
     getForgotOtpPage,
     verifyForgotOtp,
     getResetPassword,
-    postResetPassword,
     resendForgotOtp,
+    postResetPassword,
+
+    // USER PROFILE
     getUserProfile,
-    updateUserProfile
+    updateUserProfile,
+
+    // ADDRESS
+    getAddressPage,
+    getAddAddressPage,
+    addAddress,
+    updateAddress,
+    deleteAddress,
+    getEditAddress
 };

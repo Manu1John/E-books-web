@@ -69,7 +69,7 @@
             <button>Order Details</button>
             <button>Wishlist</button>
             <button>Wallet</button>
-            <button>Add Address</button>
+            <a href="/address"><button>Add Address</button></a>
             <button>Logout</button>
 
         </aside>
@@ -189,19 +189,6 @@
                             disabled
                         />
                     </div>
-
-                </div>
-
-                <div class="full-width">
-
-                    <label>
-                        Address
-                    </label>
-
-                    <textarea
-                        name="address"
-                        disabled
-                    ><%= user.address || '' %></textarea>
 
                 </div>
 
