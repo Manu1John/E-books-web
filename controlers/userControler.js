@@ -1377,7 +1377,7 @@ export default {
     postResetPassword,
     //CHANGE PASSWORD
     changePassword,
-    //CHANGE EMAIL 
+    //CHANGE EMAIL VIA OTP
     sendEmailOtp,
     verifyEmailOtp,
     // USER PROFILE
