@@ -209,31 +209,22 @@
 <!-- PASSWORD -->
 <div class="card">
 
-    <h2>
-        Change Password
-    </h2>
+    <h2>Change Password</h2>
 
-    <!-- Backend Error Message -->
     <% if (typeof error !== "undefined" && error) { %>
         <p class="error-msg">
             <%= error %>
         </p>
     <% } %>
 
-    <!-- Backend Success Message -->
     <% if (typeof success !== "undefined" && success) { %>
         <p class="success-msg">
             <%= success %>
         </p>
     <% } %>
 
-    <form
-        action="/change-password"
-        method="POST"
-        id="changePasswordForm"
-    >
+    <form action="/change-password" method="POST" id="changePasswordForm">
 
-        <!-- Current Password -->
         <input
             type="password"
             name="currentPassword"
@@ -243,10 +234,7 @@
         />
 
         <div class="two-col">
-
-            <!-- New Password -->
             <div>
-
                 <input
                     type="password"
                     name="newPassword"
@@ -254,17 +242,10 @@
                     placeholder="New password"
                     required
                 />
-
-                <small
-                    class="text-danger"
-                    id="newPasswordError"
-                ></small>
-
+                <small class="text-danger" id="newPasswordError"></small>
             </div>
 
-            <!-- Confirm Password -->
             <div>
-
                 <input
                     type="password"
                     name="confirmPassword"
@@ -272,66 +253,46 @@
                     placeholder="Confirm password"
                     required
                 />
-
-                <small
-                    class="text-danger"
-                    id="confirmPasswordError"
-                ></small>
-
+                <small class="text-danger" id="confirmPasswordError"></small>
             </div>
-
         </div>
-        <label for="">
-            show password
-        </label>
-        <i class="fa-solid fa-eye-slash" id="passwordShow"></i>
 
+        <div class="show-password-container" style="margin: 10px 0; display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <i class="fa-solid fa-eye-slash" id="passwordShow"></i>
+            <label style="cursor: pointer; user-select: none;">Show Passwords</label>
+        </div>
 
-        <!-- Password Rules -->
         <div class="password-rules">
-
             <p>Password must contain:</p>
-
             <ul>
-
                 <li id="lengthRule" class="invalid">
                     <span class="icon">❌</span>
                     At least 8 characters
                 </li>
-
                 <li id="upperRule" class="invalid">
                     <span class="icon">❌</span>
                     One uppercase letter
                 </li>
-
                 <li id="lowerRule" class="invalid">
                     <span class="icon">❌</span>
                     One lowercase letter
                 </li>
-
                 <li id="numberRule" class="invalid">
                     <span class="icon">❌</span>
                     One number
                 </li>
-
                 <li id="specialRule" class="invalid">
                     <span class="icon">❌</span>
                     One special character
                 </li>
-
             </ul>
-
         </div>
 
-        <button
-            type="submit"
-            id="btn"
-        >
+        <button type="submit" id="passwordBtn">
             UPDATE PASSWORD
         </button>
 
     </form>
-
 </div>
                 <!-- EMAIL -->
 <div class="card">

@@ -86,125 +86,55 @@
             }
         );
 
-  // CHANGE PASSWORD LIVE VALIDATION
 
-const passwordInput =
-    document.getElementById("newPassword");
+// CHANGE PASSWORD LIVE VALIDATION
+const passwordInput = document.getElementById("newPassword");
+const confirmPasswordInput = document.getElementById("confirmPassword");
+const submitBtn = document.getElementById("passwordBtn");
 
-const confirmPasswordInput =
-    document.getElementById("confirmPassword");
+// Rules elements
+const lengthRule = document.getElementById("lengthRule");
+const upperRule = document.getElementById("upperRule");
+const lowerRule = document.getElementById("lowerRule");
+const numberRule = document.getElementById("numberRule");
+const specialRule = document.getElementById("specialRule");
+const confirmPasswordError = document.getElementById("confirmPasswordError");
 
-const submitBtn =
-    document.getElementById("passwordBtn");
-
-// Rules
-const lengthRule =
-    document.getElementById("lengthRule");
-
-const upperRule =
-    document.getElementById("upperRule");
-
-const lowerRule =
-    document.getElementById("lowerRule");
-
-const numberRule =
-    document.getElementById("numberRule");
-
-const specialRule =
-    document.getElementById("specialRule");
-
-const confirmPasswordError =
-    document.getElementById("confirmPasswordError");
-
-
-// Prevent JS crash if page element not found
-if (
-    passwordInput &&
-    confirmPasswordInput &&
-    submitBtn
-) {
-
-    // Disable button initially
+// Safe Guard Initialization
+if (passwordInput && confirmPasswordInput && submitBtn) {
     submitBtn.disabled = true;
 
-    passwordInput.addEventListener(
-        "input",
-        validatePassword
-    );
-
-    confirmPasswordInput.addEventListener(
-        "input",
-        validatePassword
-    );
+    passwordInput.addEventListener("input", validatePassword);
+    confirmPasswordInput.addEventListener("input", validatePassword);
 }
 
-
 function validatePassword() {
+    // FIXED: Removed .trim() so frontend evaluation mirrors exactly what the form transmits
+    const password = passwordInput.value;
+    const confirmPassword = confirmPasswordInput.value;
 
-    const password =
-        passwordInput.value.trim();
+    // Password Evaluation Logic
+    const hasLength = password.length >= 8;
+    const hasUpper = /[A-Z]/.test(password);
+    const hasLower = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
-    const confirmPassword =
-        confirmPasswordInput.value.trim();
-
-    // Password Rules
-    const hasLength =
-        password.length >= 8;
-
-    const hasUpper =
-        /[A-Z]/.test(password);
-
-    const hasLower =
-        /[a-z]/.test(password);
-
-    const hasNumber =
-        /[0-9]/.test(password);
-
-    const hasSpecial =
-        /[!@#$%^&*(),.?":{}|<>]/.test(password);
-
-    // Update UI Rules
-    updateRule(
-        lengthRule,
-        hasLength
-    );
-
-    updateRule(
-        upperRule,
-        hasUpper
-    );
-
-    updateRule(
-        lowerRule,
-        hasLower
-    );
-
-    updateRule(
-        numberRule,
-        hasNumber
-    );
-
-    updateRule(
-        specialRule,
-        hasSpecial
-    );
+    // Update UI Rules (Safe execution via updated function)
+    updateRule(lengthRule, hasLength);
+    updateRule(upperRule, hasUpper);
+    updateRule(lowerRule, hasLower);
+    updateRule(numberRule, hasNumber);
+    updateRule(specialRule, hasSpecial);
 
     // Confirm Password Check
-    if (
-        confirmPassword &&
-        password !== confirmPassword
-    ) {
-
-        confirmPasswordError.innerText =
-            "Passwords do not match";
-
+    if (confirmPassword && password !== confirmPassword) {
+        if (confirmPasswordError) confirmPasswordError.innerText = "Passwords do not match";
     } else {
-
-        confirmPasswordError.innerText =
-            "";
+        if (confirmPasswordError) confirmPasswordError.innerText = "";
     }
 
-    // Final Validation
+    // Final Evaluation State
     const isPasswordValid =
         hasLength &&
         hasUpper &&
@@ -213,42 +143,23 @@ function validatePassword() {
         hasSpecial &&
         password === confirmPassword;
 
-    submitBtn.disabled =
-        !isPasswordValid;
+    submitBtn.disabled = !isPasswordValid;
 }
 
+function updateRule(element, isValid) {
+    // FIXED: Guard clause prevents script crashes if an element is missing from the DOM
+    if (!element) return; 
 
-function updateRule(
-    element,
-    isValid
-) {
-
-    const icon =
-        element.querySelector(".icon");
+    const icon = element.querySelector(".icon");
 
     if (isValid) {
-
-        element.classList.add(
-            "valid"
-        );
-
-        element.classList.remove(
-            "invalid"
-        );
-
-        icon.innerText = "✅";
-
+        element.classList.add("valid");
+        element.classList.remove("invalid");
+        if (icon) icon.innerText = "✅";
     } else {
-
-        element.classList.add(
-            "invalid"
-        );
-
-        element.classList.remove(
-            "valid"
-        );
-
-        icon.innerText = "❌";
+        element.classList.add("invalid");
+        element.classList.remove("valid");
+        if (icon) icon.innerText = "❌";
     }
 }
 

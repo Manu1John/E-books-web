@@ -11,22 +11,53 @@ import userController from "../controlers/userControler.js";
 
 const router = express.Router();
 
+const authFlowPaths = new Set([
+    "/login",
+    "/signup-user",
+    "/verify-otp",
+    "/forgot-password",
+    "/verify-forgot-otp",
+    "/reset-password"
+]);
+
+const markAuthFlowPage = (req, res, next) => {
+    if (
+        req.method === "GET" &&
+        authFlowPaths.has(req.path)
+    ) {
+        res.locals.authFlowGuard = true;
+        res.locals.noStorePage = true;
+    }
+
+    next();
+};
+
+const redirectLoggedInUser = (req, res, next) => {
+    if (req.session?.user) {
+        return res.redirect("/home");
+    }
+
+    next();
+};
+
+router.use(markAuthFlowPage);
+
 //////////////////////////////////
 // INDEX
 router.get("/", disableCache, userController.getuserIndex);
 
 // LOGIN
-router.get("/login", disableCache, userController.getUserLogin);
-router.post("/login", userController.postUserLogin);
+router.get("/login", disableCache, redirectLoggedInUser, userController.getUserLogin);
+router.post("/login", redirectLoggedInUser, userController.postUserLogin);
 
 // SIGNUP
-router.get("/signup-user", disableCache, userController.getUserSignup);
-router.post("/signup-user", userController.postUserSignup);
+router.get("/signup-user", disableCache, redirectLoggedInUser, userController.getUserSignup);
+router.post("/signup-user", redirectLoggedInUser, userController.postUserSignup);
 
 // OTP
-router.get("/verify-otp", disableCache, userController.getVerifyOtp);
-router.post("/verify-otp", disableCache, userController.verifyOtp);
-router.post("/resend-otp", disableCache, userController.resendOtp);
+router.get("/verify-otp", disableCache, redirectLoggedInUser, userController.getVerifyOtp);
+router.post("/verify-otp", disableCache, redirectLoggedInUser, userController.verifyOtp);
+router.post("/resend-otp", disableCache, redirectLoggedInUser, userController.resendOtp);
 
 // HOME
 router.get("/home",authenticatedUser,disableCache,userController.getHome);
@@ -39,7 +70,7 @@ router.post("/logout",disableCache,userController.postUserLogout);
 // ================= GOOGLE AUTH =================
 
 // Start Google Login
-router.get("/auth/google",disableCache,passport.authenticate("google", {scope: ["profile", "email"],prompt: "select_account"}));
+router.get("/auth/google",disableCache,redirectLoggedInUser,passport.authenticate("google", {scope: ["profile", "email"],prompt: "select_account"}));
 
 // Google Callback
 router.get("/auth/google/callback",disableCache,passport.authenticate("google", {failureRedirect: "/login",session: false}),userController.googleAuthCallback);
@@ -49,7 +80,7 @@ router.get("/auth/google/callback",disableCache,passport.authenticate("google", 
 
 
 // 1. Trigger Facebook Login screen
-router.get("/auth/facebook", disableCache, passport.authenticate("facebook", {
+router.get("/auth/facebook", disableCache, redirectLoggedInUser, passport.authenticate("facebook", {
     scope: ["email"],
     authType: "reauthenticate"
 }));
@@ -63,19 +94,19 @@ router.get("/auth/facebook/callback",
 // ================= FORGOT PASSWORD =================
 
 // Forgot password page
-router.get("/forgot-password",disableCache,userController.getForgotPassword);
+router.get("/forgot-password",disableCache,redirectLoggedInUser,userController.getForgotPassword);
 // Send OTP
-router.post("/forgot-password",userController.postForgotPassword);
+router.post("/forgot-password",redirectLoggedInUser,userController.postForgotPassword);
 // Verify forgot OTP page
-router.get("/verify-forgot-otp",disableCache,userController.getForgotOtpPage);
+router.get("/verify-forgot-otp",disableCache,redirectLoggedInUser,userController.getForgotOtpPage);
 // Verify OTP
-router.post("/verify-forgot-otp",userController.verifyForgotOtp);
+router.post("/verify-forgot-otp",redirectLoggedInUser,userController.verifyForgotOtp);
 // Reset password page
-router.get("/reset-password",disableCache,userController.getResetPassword);
+router.get("/reset-password",disableCache,redirectLoggedInUser,userController.getResetPassword);
 // Save new password
-router.post("/reset-password",userController.postResetPassword);
+router.post("/reset-password",redirectLoggedInUser,userController.postResetPassword);
 // Resend Forgot Password OTP
-router.post("/resend-forgot-otp", disableCache, userController.resendForgotOtp);
+router.post("/resend-forgot-otp", disableCache, redirectLoggedInUser, userController.resendForgotOtp);
 router.post("/update-profile",authenticatedUser,upload.single("profileImage"),userController.updateUserProfile);
 //ADDRESS PAGE
 router.get("/address",authenticatedUser,userController.getAddressPage)

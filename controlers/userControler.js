@@ -912,11 +912,8 @@ async (req, res) => {
     }
 };
 
-//CHANGE PASSWORD IN USER PROFILE
-
 const changePassword = async (req, res) => {
     try {
-
         const userId = req.session.user.id;
 
         const {
@@ -925,7 +922,7 @@ const changePassword = async (req, res) => {
             confirmPassword
         } = req.body;
 
-        // Find user
+        // Find user document
         const user = await User.findById(userId);
 
         if (!user) {
@@ -942,7 +939,7 @@ const changePassword = async (req, res) => {
             return res.render("user/userProfile", {
                 title: "User Profile",
                 cssFile: "userProfile.css",
-                jsFile:"userProfile.js",
+                jsFile: "userProfile.js",
                 user,
                 error: "Current password is incorrect"
             });
@@ -953,26 +950,24 @@ const changePassword = async (req, res) => {
             return res.render("user/userProfile", {
                 title: "User Profile",
                 cssFile: "userProfile.css",
-                jsFile:"userProfile.js",
+                jsFile: "userProfile.js",
                 user,
                 error: "Passwords do not match"
             });
         }
-        // PASSWORD STRENGTH VALIDATION
-const passwordRegex =
-/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
 
-if (!passwordRegex.test(newPassword)) {
+        // FIXED: Password regex now matches the exact special characters allowed by your frontend JS
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
 
-    return res.render("user/userProfile", {
-        title: "User Profile",
-        cssFile: "userProfile.css",
-        jsFile: "userProfile.js",
-        user,
-        error:
-        "Password must contain 8+ characters, uppercase, lowercase, number and special character"
-    });
-}
+        if (!passwordRegex.test(newPassword)) {
+            return res.render("user/userProfile", {
+                title: "User Profile",
+                cssFile: "userProfile.css",
+                jsFile: "userProfile.js",
+                user,
+                error: "Password must contain 8+ characters, uppercase, lowercase, number and special character"
+            });
+        }
 
         // Prevent same password
         const samePassword = await bcrypt.compare(
@@ -984,41 +979,30 @@ if (!passwordRegex.test(newPassword)) {
             return res.render("user/userProfile", {
                 title: "User Profile",
                 cssFile: "userProfile.css",
-                jsFile:"userProfile.js",
+                jsFile: "userProfile.js",
                 user,
                 error: "New password cannot be same as old password"
             });
         }
 
-        // Hash password
-        const hashedPassword =
-            await bcrypt.hash(newPassword, 10);
+        // Hash password manually
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-        // Update password
-        await User.findByIdAndUpdate(
-            userId,
-            {
-                password: hashedPassword
-            }
-        );
-        const updatedUser =
-    await User.findById(userId);
+        // FIXED: Using standard document assignment and .save() to protect schema hooks consistency
+        user.password = hashedPassword;
+        const updatedUser = await user.save();
 
+        // FIXED: Passing updatedUser instead of the stale user variable
         return res.render("user/userProfile", {
             title: "User Profile",
             cssFile: "userProfile.css",
-            jsFile:"userProfile.js",
-            user,
+            jsFile: "userProfile.js",
+            user: updatedUser,
             success: "Password changed successfully"
         });
 
     } catch (error) {
-
-        console.log(
-            "CHANGE PASSWORD ERROR:",
-            error
-        );
-
+        console.log("CHANGE PASSWORD ERROR:", error);
         return res.redirect("/user-profile");
     }
 };
