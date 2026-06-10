@@ -1032,6 +1032,306 @@ if (!passwordRegex.test(newPassword)) {
     }
 };
 
+// SEND OTP FOR EMAIL CHANGE
+const sendEmailOtp = async (req, res) => {
+    try {
+
+        const userId =
+            req.session.user.id;
+
+        const { newEmail } =
+            req.body;
+
+        const user =
+            await User.findById(userId);
+
+        if (!user) {
+            return res.redirect(
+                "/user-profile"
+            );
+        }
+
+        // check empty
+        if (!newEmail?.trim()) {
+
+            return res.render(
+                "user/userProfile",
+                {
+                    title:
+                        "User Profile",
+
+                    cssFile:
+                        "userProfile.css",
+
+                    jsFile:
+                        "userProfile.js",
+
+                    user,
+
+                    emailError:
+                        "Please enter email"
+                }
+            );
+        }
+
+        const normalizedEmail =
+            newEmail
+                .trim()
+                .toLowerCase();
+
+        // prevent same email
+        if (
+            normalizedEmail ===
+            user.email
+        ) {
+
+            return res.render(
+                "user/userProfile",
+                {
+                    title:
+                        "User Profile",
+
+                    cssFile:
+                        "userProfile.css",
+
+                    jsFile:
+                        "userProfile.js",
+
+                    user,
+
+                    emailError:
+                        "New email cannot be same as current email"
+                }
+            );
+        }
+
+        // check existing user
+        const existingUser =
+            await User.findOne({
+                email:
+                    normalizedEmail
+            });
+
+        if (existingUser) {
+
+            return res.render(
+                "user/userProfile",
+                {
+                    title:
+                        "User Profile",
+
+                    cssFile:
+                        "userProfile.css",
+
+                    jsFile:
+                        "userProfile.js",
+
+                    user,
+
+                    emailError:
+                        "Email already exists"
+                }
+            );
+        }
+
+        // generate OTP
+        const otp =
+            AuthService.generateOtp();
+
+        // session store
+        req.session.emailOtp =
+            otp;
+
+        req.session.newEmail =
+            normalizedEmail;
+
+        req.session.emailOtpExpire =
+            Date.now() +
+            2 * 60 * 1000;
+
+        // send OTP
+        await AuthService
+            .sendVerificationEmail(
+                normalizedEmail,
+                otp
+            );
+
+        return res.render(
+            "user/userProfile",
+            {
+                title:
+                    "User Profile",
+
+                cssFile:
+                    "userProfile.css",
+
+                jsFile:
+                    "userProfile.js",
+
+                user,
+
+                emailSuccess:
+                    "OTP sent to your email"
+            }
+        );
+
+    } catch (error) {
+
+        console.log(
+            "SEND EMAIL OTP ERROR:",
+            error
+        );
+
+        return res.redirect(
+            "/user-profile"
+        );
+    }
+};
+
+// VERIFY EMAIL OTP
+const verifyEmailOtp =
+async (req, res) => {
+
+    try {
+
+        const userId =
+            req.session.user.id;
+
+        const { otp } =
+            req.body;
+
+        const user =
+            await User.findById(
+                userId
+            );
+
+        if (!user) {
+
+            return res.redirect(
+                "/user-profile"
+            );
+        }
+
+        // expiry check
+        if (
+            !req.session
+                .emailOtpExpire ||
+
+            Date.now() >
+            req.session
+                .emailOtpExpire
+        ) {
+
+            return res.render(
+                "user/userProfile",
+                {
+                    title:
+                        "User Profile",
+
+                    cssFile:
+                        "userProfile.css",
+
+                    jsFile:
+                        "userProfile.js",
+
+                    user,
+
+                    emailError:
+                        "OTP expired"
+                }
+            );
+        }
+
+        // OTP check
+        if (
+            String(otp).trim()
+            !==
+            String(
+                req.session
+                    .emailOtp
+            ).trim()
+        ) {
+
+            return res.render(
+                "user/userProfile",
+                {
+                    title:
+                        "User Profile",
+
+                    cssFile:
+                        "userProfile.css",
+
+                    jsFile:
+                        "userProfile.js",
+
+                    user,
+
+                    emailError:
+                        "Invalid OTP"
+                }
+            );
+        }
+
+        // update email
+        await User
+            .findByIdAndUpdate(
+                userId,
+                {
+                    email:
+                        req.session
+                            .newEmail
+                }
+            );
+
+        // update session email
+        req.session.user.email =
+            req.session
+                .newEmail;
+
+        // clear session
+        delete req.session.emailOtp;
+        delete req.session.newEmail;
+        delete req.session
+            .emailOtpExpire;
+
+        const updatedUser =
+            await User.findById(
+                userId
+            );
+
+        return res.render(
+            "user/userProfile",
+            {
+                title:
+                    "User Profile",
+
+                cssFile:
+                    "userProfile.css",
+
+                jsFile:
+                    "userProfile.js",
+
+                user:
+                    updatedUser,
+
+                emailSuccess:
+                    "Email updated successfully"
+            }
+        );
+
+    } catch (error) {
+
+        console.log(
+            "VERIFY EMAIL OTP ERROR:",
+            error
+        );
+
+        return res.redirect(
+            "/user-profile"
+        );
+    }
+};
+
 // LOGOUT
 const postUserLogout = (req, res, next) => {
     try {
@@ -1052,6 +1352,8 @@ const postUserLogout = (req, res, next) => {
         next(error);
     }
 };
+
+
 export default {
     getuserIndex,
     getUserLogin,
@@ -1075,6 +1377,9 @@ export default {
     postResetPassword,
     //CHANGE PASSWORD
     changePassword,
+    //CHANGE EMAIL 
+    sendEmailOtp,
+    verifyEmailOtp,
     // USER PROFILE
     getUserProfile,
     updateUserProfile,

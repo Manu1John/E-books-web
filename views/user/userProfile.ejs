@@ -334,44 +334,69 @@
 
 </div>
                 <!-- EMAIL -->
-                <div class="card">
+<div class="card">
 
-                    <h2>
-                        Change Email
-                    </h2>
+    <h2>
+        Change Email
+    </h2>
 
-                    <input
-                        type="email"
-                        placeholder="Current email"
-                        disabled
-                    />
+    <% if (typeof emailError !== "undefined" && emailError) { %>
+        <p class="error-msg">
+            <%= emailError %>
+        </p>
+    <% } %>
 
-                    <input
-                        type="email"
-                        placeholder="New email"
-                        disabled
-                    />
+    <% if (typeof emailSuccess !== "undefined" && emailSuccess) { %>
+        <p class="success-msg">
+            <%= emailSuccess %>
+        </p>
+    <% } %>
 
-                    <button disabled>
-                        Send OTP
-                    </button>
+    <!-- SEND OTP -->
+    <form
+        action="/send-email-otp"
+        method="POST"
+    >
 
-                    <div class="otp-box">
+        <input
+            type="email"
+            value="<%= user.email %>"
+            disabled
+        />
 
-                        <input maxlength="1" disabled>
-                        <input maxlength="1" disabled>
-                        <input maxlength="1" disabled>
-                        <input maxlength="1" disabled>
-                        <input maxlength="1" disabled>
-                        <input maxlength="1" disabled>
+        <input
+            type="email"
+            name="newEmail"
+            placeholder="New email"
+            required
+        />
 
-                    </div>
+        <button type="submit">
+            Send OTP
+        </button>
 
-                    <button disabled>
-                        Verify & Update Email
-                    </button>
+    </form>
 
-                </div>
+    <!-- VERIFY OTP -->
+    <form
+        action="/verify-email-otp"
+        method="POST"
+    >
+
+        <input
+            type="text"
+            name="otp"
+            placeholder="Enter OTP"
+            required
+        />
+
+        <button type="submit">
+            Verify & Update Email
+        </button>
+
+    </form>
+
+</div>
 
             </div>
 

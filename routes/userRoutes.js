@@ -89,5 +89,8 @@ router.post("/edit-address/:id",authenticatedUser,userController.updateAddress);
 router.post("/delete-address/:id",authenticatedUser,userController.deleteAddress);
 //CHANGE PASSWORD
 router.post("/change-password",authenticatedUser,userController.changePassword);
+//CHANGE EMAIL
+router.post("/send-email-otp",userController.sendEmailOtp);
+router.post("/verify-email-otp",userController.verifyEmailOtp);
 
 export default router;
