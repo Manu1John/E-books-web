@@ -1,8 +1,25 @@
 import User from "../models/User.js";
+import {
+    clearUserSessionCookie,
+    destroySession,
+    refreshUserSession
+} from "../utils/sessionUtils.js";
+
+const clearInvalidUserSession = async (req, res) => {
+    try {
+        await destroySession(req);
+    } catch (error) {
+        console.error("User session cleanup error:", error);
+    }
+
+    clearUserSessionCookie(res);
+    return res.redirect("/");
+};
+
 // authentication middleware
 const isAuthenticated = (req, res, next) => {
 
-    if (req.session.admin) {
+    if (req.session?.admin) {
         return next();
     }
 
@@ -20,10 +37,7 @@ async (
 
     try {
 
-        // no session
-        if (
-            !req.session.user
-        ) {
+        if (!req.session?.user?.id) {
             return res.redirect("/");
         }
 
@@ -35,29 +49,17 @@ async (
 
         // user deleted
         if (!user) {
-
-    delete req.session.user;
-
-    return res.redirect("/");
-}
+            return clearInvalidUserSession(req, res);
+        }
 
         // USER BLOCKED
         if (user.isBlocked) {
-                res.clearCookie(
-                    "connect.sid"
-                );
-            delete req.session.user;
-
-                return res.redirect(
-                    "/"
-                );
-        
-
-            return;
+            return clearInvalidUserSession(req, res);
         }
 
-        // attach user
+        refreshUserSession(req, user);
         req.user = user;
+        res.locals.user = req.session.user;
 
         next();
 
@@ -65,7 +67,7 @@ async (
 
         console.log(error);
 
-        return res.redirect("/");
+        return clearInvalidUserSession(req, res);
     }
 };
 

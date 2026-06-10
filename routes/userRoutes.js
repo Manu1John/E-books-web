@@ -11,7 +11,7 @@ import userController from "../controlers/userControler.js";
 
 const router = express.Router();
 
-
+//////////////////////////////////
 // INDEX
 router.get("/", disableCache, userController.getuserIndex);
 
@@ -51,7 +51,7 @@ router.get("/auth/google/callback",disableCache,passport.authenticate("google", 
 // 1. Trigger Facebook Login screen
 router.get("/auth/facebook", disableCache, passport.authenticate("facebook", {
     scope: ["email"],
-    authType: "reauthenticate" // 🔥 THIS is the magic word that forces a new login!
+    authType: "reauthenticate"
 }));
 
 // 2. Handle the incoming redirect back from Facebook
@@ -76,7 +76,7 @@ router.get("/reset-password",disableCache,userController.getResetPassword);
 router.post("/reset-password",userController.postResetPassword);
 // Resend Forgot Password OTP
 router.post("/resend-forgot-otp", disableCache, userController.resendForgotOtp);
-router.post("/update-profile",upload.single("profileImage"),userController.updateUserProfile);
+router.post("/update-profile",authenticatedUser,upload.single("profileImage"),userController.updateUserProfile);
 //ADDRESS PAGE
 router.get("/address",authenticatedUser,userController.getAddressPage)
 router.get("/add-address",authenticatedUser,userController.getAddAddressPage);
@@ -90,7 +90,7 @@ router.post("/delete-address/:id",authenticatedUser,userController.deleteAddress
 //CHANGE PASSWORD
 router.post("/change-password",authenticatedUser,userController.changePassword);
 //CHANGE EMAIL
-router.post("/send-email-otp",userController.sendEmailOtp);
-router.post("/verify-email-otp",userController.verifyEmailOtp);
+router.post("/send-email-otp",authenticatedUser,userController.sendEmailOtp);
+router.post("/verify-email-otp",authenticatedUser,userController.verifyEmailOtp);
 
 export default router;

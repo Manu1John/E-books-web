@@ -2,6 +2,21 @@ import User from "../models/User.js";
 import Address from "../models/address.js";
 import bcrypt from "bcrypt";
 import AuthService from "../services/authService.js";
+import {
+    clearUserSessionCookie,
+    createUserSession,
+    destroySession
+} from "../utils/sessionUtils.js";
+
+const cleanupSessionSafely = async (req, res, context) => {
+    try {
+        await destroySession(req);
+    } catch (error) {
+        console.error(`${context} session cleanup error:`, error);
+    }
+
+    clearUserSessionCookie(res);
+};
 
 const getuserIndex = (req, res) => {
     try {
@@ -53,6 +68,7 @@ const googleAuthCallback = async (req, res) => {
         }
 
         if (req.user.isBlocked) {
+            await cleanupSessionSafely(req, res, "Google blocked user");
             return res.render("user/loginAndSignup", {
                 title: "Signin",
                 cssFile: "loginAndSignup.css",
@@ -63,18 +79,8 @@ const googleAuthCallback = async (req, res) => {
             });
         }
 
-        req.session.user = {
-            id: req.user._id,
-            email: req.user.email
-        };
-
-        req.session.save((err) => {
-            if (err) {
-                console.error("Google session save error:", err);
-                return res.redirect("/login");
-            }
-            return res.redirect("/home");
-        });
+        await createUserSession(req, req.user);
+        return res.redirect("/home");
 
     } catch (error) {
         console.error("Google callback error:", error);
@@ -90,6 +96,7 @@ const facebookAuthCallback = async (req, res) => {
         }
 
         if (req.user.isBlocked) {
+            await cleanupSessionSafely(req, res, "Facebook blocked user");
             return res.render("user/loginAndSignup", {
                 title: "Signin",
                 cssFile: "loginAndSignup.css",
@@ -100,18 +107,8 @@ const facebookAuthCallback = async (req, res) => {
             });
         }
 
-        req.session.user = {
-            id: req.user._id,
-            email: req.user.email
-        };
-
-        req.session.save((err) => {
-            if (err) {
-                console.error("Facebook session save error:", err);
-                return res.redirect("/login");
-            }
-            return res.redirect("/home");
-        });
+        await createUserSession(req, req.user);
+        return res.redirect("/home");
 
     } catch (error) {
         console.error("Facebook callback error:", error);
@@ -284,10 +281,7 @@ const verifyOtp = async (req, res) => {
             password: userData.password
         });
 
-        req.session.destroy((err) => {
-            if (err) console.error("Session destroy error:", err);
-        });
-
+        await cleanupSessionSafely(req, res, "Signup OTP");
         return res.redirect("/login");
 
     } catch (err) {
@@ -316,6 +310,7 @@ const postUserLogin = async (req, res) => {
         }
 
         if (user.isBlocked) {
+            await cleanupSessionSafely(req, res, "Blocked user login");
             return res.render("user/loginAndSignup", {
                 title: "Signup", cssFile: "loginAndSignup.css", jsFile: "signupAuth.js",
                 error: "Your account has been blocked by an admin", success: null, isSignup: false
@@ -331,21 +326,17 @@ const postUserLogin = async (req, res) => {
             });
         }
 
-        req.session.user = {
-            id: user._id,
-            email: user.email
-        };
+        try {
+            await createUserSession(req, user);
+        } catch (sessionError) {
+            console.error("User login session error:", sessionError);
+            return res.render("user/loginAndSignup", {
+                title: "Signup", cssFile: "loginAndSignup.css", jsFile: "signupAuth.js",
+                error: "Session Error", success: null, isSignup: false
+            });
+        }
 
-        req.session.save((err) => {
-            if (err) {
-                console.error(err);
-                return res.render("user/loginAndSignup", {
-                    title: "Signup", cssFile: "loginAndSignup.css", jsFile: "signupAuth.js",
-                    error: "Session Error", success: null, isSignup: false
-                });
-            }
-            return res.redirect("/home");
-        });
+        return res.redirect("/home");
 
     } catch (error) {
         console.error(error);
@@ -1333,16 +1324,10 @@ async (req, res) => {
 };
 
 // LOGOUT
-const postUserLogout = (req, res, next) => {
+const postUserLogout = async (req, res, next) => {
     try {
-        // Safe check: Ensure session exists before attempting to delete a property
-        if (req.session) {
-            delete req.session.user;
-        }
-
-        // Clear the session cookie from the user's browser
-        res.clearCookie("connect.sid");
-        
+        await destroySession(req);
+        clearUserSessionCookie(res);
         return res.redirect("/");
     } catch (error) {
         // Log the error for server-side debugging
@@ -1352,7 +1337,6 @@ const postUserLogout = (req, res, next) => {
         next(error);
     }
 };
-
 
 export default {
     getuserIndex,

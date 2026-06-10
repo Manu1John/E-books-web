@@ -10,6 +10,10 @@ import { fileURLToPath } from 'url';
 import adminRoutes from './routes/adminRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import connectDB from './config/db.js';
+import {
+    adminSessionConfig,
+    userSessionConfig
+} from './utils/sessionUtils.js';
 
 // 🚨 console.log(process.env.BREVO_API_KEY) has been REMOVED for security.
 // 🧹 Unused middleware imports were removed from here.
@@ -18,6 +22,10 @@ const app = express();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+if (process.env.NODE_ENV === "production") {
+    app.set("trust proxy", 1);
+}
 
 // body parser
 app.use(express.urlencoded({ extended: true }));
@@ -33,23 +41,10 @@ app.set('views', path.join(__dirname, 'views'));
 // initalize DB
 connectDB();
 
-// session
-app.use(
-    session({
-        secret: process.env.SESSION_SECRET || 'mySecretKey',
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-            maxAge: 1000 * 60 * 60, // 1 hour
-            httpOnly: true,
-            secure: false, // Set to true if deploying with HTTPS
-            sameSite: "lax"
-        }
-    })
-);
-app.use(passport.initialize());
 // routes
-app.use('/admin', adminRoutes);
+app.use('/admin', session(adminSessionConfig), adminRoutes);
+app.use(session(userSessionConfig));
+app.use(passport.initialize());
 app.use("/", userRoutes);
 
 const PORT = process.env.PORT || 5000;
