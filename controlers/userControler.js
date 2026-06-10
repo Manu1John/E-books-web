@@ -921,6 +921,117 @@ async (req, res) => {
     }
 };
 
+//CHANGE PASSWORD IN USER PROFILE
+
+const changePassword = async (req, res) => {
+    try {
+
+        const userId = req.session.user.id;
+
+        const {
+            currentPassword,
+            newPassword,
+            confirmPassword
+        } = req.body;
+
+        // Find user
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.redirect("/user-profile");
+        }
+
+        // Current password check
+        const isMatch = await bcrypt.compare(
+            currentPassword,
+            user.password
+        );
+
+        if (!isMatch) {
+            return res.render("user/userProfile", {
+                title: "User Profile",
+                cssFile: "userProfile.css",
+                jsFile:"userProfile.js",
+                user,
+                error: "Current password is incorrect"
+            });
+        }
+
+        // Password match check
+        if (newPassword !== confirmPassword) {
+            return res.render("user/userProfile", {
+                title: "User Profile",
+                cssFile: "userProfile.css",
+                jsFile:"userProfile.js",
+                user,
+                error: "Passwords do not match"
+            });
+        }
+        // PASSWORD STRENGTH VALIDATION
+const passwordRegex =
+/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+
+if (!passwordRegex.test(newPassword)) {
+
+    return res.render("user/userProfile", {
+        title: "User Profile",
+        cssFile: "userProfile.css",
+        jsFile: "userProfile.js",
+        user,
+        error:
+        "Password must contain 8+ characters, uppercase, lowercase, number and special character"
+    });
+}
+
+        // Prevent same password
+        const samePassword = await bcrypt.compare(
+            newPassword,
+            user.password
+        );
+
+        if (samePassword) {
+            return res.render("user/userProfile", {
+                title: "User Profile",
+                cssFile: "userProfile.css",
+                jsFile:"userProfile.js",
+                user,
+                error: "New password cannot be same as old password"
+            });
+        }
+
+        // Hash password
+        const hashedPassword =
+            await bcrypt.hash(newPassword, 10);
+
+        // Update password
+        await User.findByIdAndUpdate(
+            userId,
+            {
+                password: hashedPassword
+            }
+        );
+        const updatedUser =
+    await User.findById(userId);
+
+        return res.render("user/userProfile", {
+            title: "User Profile",
+            cssFile: "userProfile.css",
+            jsFile:"userProfile.js",
+            user,
+            success: "Password changed successfully"
+        });
+
+    } catch (error) {
+
+        console.log(
+            "CHANGE PASSWORD ERROR:",
+            error
+        );
+
+        return res.redirect("/user-profile");
+    }
+};
+
 // LOGOUT
 const postUserLogout = (req, res, next) => {
     try {
@@ -962,6 +1073,8 @@ export default {
     getResetPassword,
     resendForgotOtp,
     postResetPassword,
+    //CHANGE PASSWORD
+    changePassword,
     // USER PROFILE
     getUserProfile,
     updateUserProfile,

@@ -301,3 +301,52 @@ textarea{
     cursor:not-allowed;
 }
 
+.error-msg {
+    background: #ffe5e5;
+    color: #d60000;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.success-msg {
+    background: #e8ffe8;
+    color: #008000;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+.password-rules {
+    margin-top: 15px;
+    padding: 15px;
+    border-radius: 10px;
+    background: #f8f8f8;
+    border: 1px solid #ddd;
+}
+
+.password-rules ul {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0;
+}
+
+.password-rules li {
+    margin-bottom: 8px;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.valid {
+    color: green;
+}
+
+.invalid {
+    color: red;
+}
+
+.text-danger {
+    color: red;
+    font-size: 13px;
+}

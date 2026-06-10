@@ -64,7 +64,7 @@
             </div>
 
             <button>Profile Overview</button>
-            <button>My Orders</button>
+            <button>My Orders</button> 
             <button>Order Details</button>
             <button>Wishlist</button>
             <button>Wallet</button>
@@ -206,41 +206,133 @@
             <!-- PASSWORD & EMAIL -->
             <div class="bottom-grid">
 
-                <!-- PASSWORD -->
-                <div class="card">
+<!-- PASSWORD -->
+<div class="card">
 
-                    <h2>
-                        Change Password
-                    </h2>
+    <h2>
+        Change Password
+    </h2>
 
-                    <input
-                        type="password"
-                        placeholder="Current password"
-                        disabled
-                    />
+    <!-- Backend Error Message -->
+    <% if (typeof error !== "undefined" && error) { %>
+        <p class="error-msg">
+            <%= error %>
+        </p>
+    <% } %>
 
-                    <div class="two-col">
+    <!-- Backend Success Message -->
+    <% if (typeof success !== "undefined" && success) { %>
+        <p class="success-msg">
+            <%= success %>
+        </p>
+    <% } %>
 
-                        <input
-                            type="password"
-                            placeholder="New password"
-                            disabled
-                        />
+    <form
+        action="/change-password"
+        method="POST"
+        id="changePasswordForm"
+    >
 
-                        <input
-                            type="password"
-                            placeholder="Confirm password"
-                            disabled
-                        />
+        <!-- Current Password -->
+        <input
+            type="password"
+            name="currentPassword"
+            id="currentPassword"
+            placeholder="Current password"
+            required
+        />
 
-                    </div>
+        <div class="two-col">
 
-                    <button disabled>
-                        UPDATE PASSWORD
-                    </button>
+            <!-- New Password -->
+            <div>
 
-                </div>
+                <input
+                    type="password"
+                    name="newPassword"
+                    id="newPassword"
+                    placeholder="New password"
+                    required
+                />
 
+                <small
+                    class="text-danger"
+                    id="newPasswordError"
+                ></small>
+
+            </div>
+
+            <!-- Confirm Password -->
+            <div>
+
+                <input
+                    type="password"
+                    name="confirmPassword"
+                    id="confirmPassword"
+                    placeholder="Confirm password"
+                    required
+                />
+
+                <small
+                    class="text-danger"
+                    id="confirmPasswordError"
+                ></small>
+
+            </div>
+
+        </div>
+        <label for="">
+            show password
+        </label>
+        <i class="fa-solid fa-eye-slash" id="passwordShow"></i>
+
+
+        <!-- Password Rules -->
+        <div class="password-rules">
+
+            <p>Password must contain:</p>
+
+            <ul>
+
+                <li id="lengthRule" class="invalid">
+                    <span class="icon">❌</span>
+                    At least 8 characters
+                </li>
+
+                <li id="upperRule" class="invalid">
+                    <span class="icon">❌</span>
+                    One uppercase letter
+                </li>
+
+                <li id="lowerRule" class="invalid">
+                    <span class="icon">❌</span>
+                    One lowercase letter
+                </li>
+
+                <li id="numberRule" class="invalid">
+                    <span class="icon">❌</span>
+                    One number
+                </li>
+
+                <li id="specialRule" class="invalid">
+                    <span class="icon">❌</span>
+                    One special character
+                </li>
+
+            </ul>
+
+        </div>
+
+        <button
+            type="submit"
+            id="btn"
+        >
+            UPDATE PASSWORD
+        </button>
+
+    </form>
+
+</div>
                 <!-- EMAIL -->
                 <div class="card">
 

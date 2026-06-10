@@ -87,5 +87,7 @@ router.get( "/edit-address/:id", authenticatedUser, userController.getEditAddres
 router.post("/edit-address/:id",authenticatedUser,userController.updateAddress);
 // DELETE ADDRESS
 router.post("/delete-address/:id",authenticatedUser,userController.deleteAddress);
+//CHANGE PASSWORD
+router.post("/change-password",authenticatedUser,userController.changePassword);
 
 export default router;
