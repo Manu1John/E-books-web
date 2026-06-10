@@ -69,12 +69,28 @@ const getDashboard = async (req, res) => {
         const limit = 5;
         const skip = (page - 1) * limit;
 
-        const filter = {
+const filter = {
+    $or: [
+        {
+            firstName: {
+                $regex: search,
+                $options: "i"
+            }
+        },
+        {
+            lastName: {
+                $regex: search,
+                $options: "i"
+            }
+        },
+        {
             email: {
                 $regex: search,
                 $options: "i"
             }
-        };
+        }
+    ]
+};
 
         const totalUsers = await User.countDocuments(filter);
 
