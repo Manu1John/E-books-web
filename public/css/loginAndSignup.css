@@ -345,3 +345,30 @@ small{
     color: red;
 }
 
+/* PASSWORD EYE ICON */
+
+.password-container {
+    position: relative;
+    width: 100%;
+    margin: 4px 0;
+}
+
+.password-container input {
+    width: 100%;
+    padding-right: 45px; /* space for eye icon */
+}
+
+.eye-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #666;
+    font-size: 16px;
+    z-index: 10;
+}
+
+.eye-icon:hover {
+    color: #FF4B2B;
+}

@@ -15,22 +15,18 @@ signInButton.addEventListener('click', () => {
 
 //password visiblity
 
-  function togglePasswordVisibility(){
-    const signupPasswordField = document.getElementById("password")
-    const confirmsignupPasswordField = document.getElementById("confirmPassword")
-    const signinPasswordField =document.getElementById("loginPassword")
-    if(signupPasswordField.type === "password" && confirmsignupPasswordField.type === "password"
-       && signinPasswordField.type==="password"){
-      signupPasswordField.type = "text"
-      confirmsignupPasswordField.type = "text"
-      signinPasswordField.type ="text"
-    }else{
-      signupPasswordField.type = "password"
-      confirmsignupPasswordField.type = "password"
-      signinPasswordField.type ="password"
-    }
+function togglePasswordVisibility(inputId, icon) {
+    const field = document.getElementById(inputId);
 
-  }
+    if (field.type === "password") {
+        field.type = "text";
+        icon.classList.replace("fa-eye", "fa-eye-slash");
+    } else {
+        field.type = "password";
+        icon.classList.replace("fa-eye-slash", "fa-eye");
+    }
+}
+
 
 
 //validaton of signup page

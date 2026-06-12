@@ -1,12 +1,19 @@
 //password visiblity
 
+function togglePasswordVisibility() {
 
-  function togglePasswordVisibility(){
-    const passwordField = document.getElementById("password")
-    if(passwordField.type === "password"){
-      passwordField.type = "text"
-    }else{
-      passwordField.type = "password"
+    const passwordField = document.getElementById("password");
+    const eyeIcon = document.getElementById("togglePassword");
+
+    if (passwordField.type === "password") {
+        passwordField.type = "text";
+
+        eyeIcon.classList.remove("fa-eye");
+        eyeIcon.classList.add("fa-eye-slash");
+    } else {
+        passwordField.type = "password";
+
+        eyeIcon.classList.remove("fa-eye-slash");
+        eyeIcon.classList.add("fa-eye");
     }
-
-  }
+}

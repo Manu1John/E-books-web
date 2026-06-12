@@ -20,15 +20,14 @@
        required  class="fadeIn second my-login-input"
            pattern=".*\S.*" autocomplete="off"
     title="Username cannot be empty or contain only spaces">
+    <div class="password-container">
       <input type="password" id="password"
        name="password" placeholder="Password"
          class="fadeIn third my-login-input"
             pattern=".*\S.*" autocomplete="off"
     title="Password cannot be empty or contain only spaces" >
-    <a href=""></a>
-    <label for="">Show password
-    <input id="toggleIcon" type="checkbox" class="fa fa-eye" onclick="togglePasswordVisibility()"></i>
-    </label>
+    <i class="fa-solid fa-eye eye-icon" id="togglePassword" onclick="togglePasswordVisibility()"></i>
+</div>
       <input type="submit" class="fadeIn fourth" value="Log In">
     </form>
   </div>
