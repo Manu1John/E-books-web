@@ -15,6 +15,9 @@ import {
     userSessionConfig
 } from './utils/sessionUtils.js';
 
+import methodOverride from "method-override";
+
+
 // 🚨 console.log(process.env.BREVO_API_KEY) has been REMOVED for security.
 // 🧹 Unused middleware imports were removed from here.
 
@@ -42,10 +45,12 @@ app.set('views', path.join(__dirname, 'views'));
 connectDB();
 
 // routes
+app.use(methodOverride("_method"));
 app.use('/admin', session(adminSessionConfig), adminRoutes);
 app.use(session(userSessionConfig));
 app.use(passport.initialize());
 app.use("/", userRoutes);
+
 
 const PORT = process.env.PORT || 5000;
 

@@ -13,7 +13,6 @@
             <li><a href="#">Orders</a></li>
             <li><a href="#">Offers</a></li>
             <li><a href="#">Categories</a></li>
-
         </ul>
 
     </aside>
@@ -24,39 +23,40 @@
         <!-- Top Navbar -->
         <div class="top-bar">
 
-<form
-    action="/admin/dashboard"
-    method="GET"
-    id="searchForm"
->
-
-    <div class="search-box">
-
-        <i class="fa fa-search"></i>
-
-        <input
-            type="text"
-            id="searchInput"
-            name="search"
-            placeholder="Search by email or name"
-            value="<%= search || '' %>"
-        >
-
-        <% if(search){ %>
-
-            <button
-                type="button"
-                id="clearSearch"
-                class="clear-btn"
+            <form
+                action="/admin/dashboard"
+                method="GET"
+                id="searchForm"
             >
-                ✖
-            </button>
 
-        <% } %>
+                <div class="search-box">
 
-    </div>
+                    <i class="fa fa-search"></i>
 
-</form>
+                    <input
+                        type="text"
+                        id="searchInput"
+                        name="search"
+                        placeholder="Search by email or name"
+                        value="<%= search || '' %>"
+                    >
+
+                    <% if(search){ %>
+
+                        <button
+                            type="button"
+                            id="clearSearch"
+                            class="clear-btn"
+                        >
+                            ✖
+                        </button>
+
+                    <% } %>
+
+                </div>
+
+            </form>
+
             <form
                 action="/admin/logout"
                 method="POST"
@@ -72,13 +72,10 @@
         <h2 class="page-title">
             Users
         </h2>
-        <h5 class="page-users-count">Total users:  <%= totalUsers %></h5>
-<!-- 
-        <div class="wallet-wrapper">
-            <button class="wallet-btn">
-                Go to Wallet
-            </button>
-        </div> -->
+
+        <h5 class="page-users-count">
+            Total users: <%= totalUsers %>
+        </h5>
 
         <!-- Table -->
         <div class="table-container">
@@ -97,78 +94,111 @@
                 </thead>
 
                 <tbody>
-                    <%users.forEach((user,index)=>{%>
+
+                    <% users.forEach((user,index)=> { %>
+
                     <tr>
-                        <td><%= ((currentPage - 1) * 5) + index + 1 %></td>
-                        <td><%=user.firstName%></td>
-                        <td><%=user.lastName%></td>
-                        <td><%=user.email%></td>
+
+                        <td>
+                            <%= ((currentPage - 1) * 5) + index + 1 %>
+                        </td>
+
+                        <td>
+                            <%= user.firstName %>
+                        </td>
+
+                        <td>
+                            <%= user.lastName %>
+                        </td>
+
+                        <td>
+                            <%= user.email %>
+                        </td>
+
                         <td>
                             <span class="status active">
-                            <%= user.isBlocked ? "Blocked" : "Active" %>
+                                <%= user.isBlocked ? "Blocked" : "Active" %>
                             </span>
                         </td>
-                        <td>
-                            <%if(user.isBlocked){%>
-                                <a href="/admin/unblock-user/<%=user.id%>"  >
-                                    
-                            <button class="block-btn" onclick="return confirm('Are you sure you want to unblock this user?')">
-                                Unblock
-                            </button>
-                            </a>
-                            <%}else{%>
-                            <a href="/admin/block-user/<%=user.id%>" >
-                                  
-                            <button class="block-btn" onclick="return confirm('Are you sure you want to block this user?')">
-                                block
-                            </button>
-                            </a>
-                            <%}%>
-                        </td>
+
+<td>
+
+    <% if(user.isBlocked){ %>
+
+        <form
+            action="/admin/unblock-user/<%= user.id %>?_method=PATCH"
+            method="POST"
+            style="display:inline;"
+            onsubmit="return confirm('Are you sure you want to unblock this user?')"
+        >
+            <button
+                type="submit"
+                class="block-btn"
+            >
+                Unblock
+            </button>
+        </form>
+
+    <% } else { %>
+
+        <form
+            action="/admin/block-user/<%= user.id %>?_method=PATCH"
+            method="POST"
+            style="display:inline;"
+            onsubmit="return confirm('Are you sure you want to block this user?')"
+        >
+            <button
+                type="submit"
+                class="block-btn"
+            >
+                Block
+            </button>
+        </form>
+
+    <% } %>
+
+</td>
+
                     </tr>
 
-                   
-                    </tr>
-                    <%})%>
-                    
+                    <% }) %>
+
                 </tbody>
 
             </table>
+
             <div class="pagination">
 
-    <% if(currentPage > 1){ %>
+                <% if(currentPage > 1){ %>
 
-        <a href="/admin/dashboard?page=<%= currentPage - 1 %>&search=<%= search %>">
-            Previous
-        </a>
+                    <a href="/admin/dashboard?page=<%= currentPage - 1 %>&search=<%= search %>">
+                        Previous
+                    </a>
 
-    <% } %>
+                <% } %>
 
-    <% for(let i = 1; i <= totalPages; i++){ %>
+                <% for(let i = 1; i <= totalPages; i++){ %>
 
-        <a
-        href="/admin/dashboard?page=<%= i %>&search=<%= search %>"
-        >
-            <%= i %>
-        </a>
+                    <a href="/admin/dashboard?page=<%= i %>&search=<%= search %>">
+                        <%= i %>
+                    </a>
 
-    <% } %>
+                <% } %>
 
-    <% if(currentPage < totalPages){ %>
+                <% if(currentPage < totalPages){ %>
 
-<a href="/admin/dashboard?page=<%= currentPage + 1 %>&search=<%= search %>">
-            Next
-        </a>
+                    <a href="/admin/dashboard?page=<%= currentPage + 1 %>&search=<%= search %>">
+                        Next
+                    </a>
 
-    <% } %>
+                <% } %>
 
-</div>
+            </div>
 
         </div>
 
     </main>
 
 </div>
+
 <%- include('../partials/footer') %>
-
-

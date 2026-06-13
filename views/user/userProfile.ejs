@@ -100,7 +100,7 @@
 
             <!-- PERSONAL INFO -->
             <form
-                action="/update-profile"
+                action="/update-profile?_method=PUT"
                 method="POST"
                 enctype="multipart/form-data"
                 class="info-card"
@@ -223,7 +223,7 @@
         </p>
     <% } %>
 
-    <form action="/change-password" method="POST" id="changePasswordForm">
+    <form action="/change-password?_method=PATCH" method="POST" id="changePasswordForm">
 
         <input
             type="password"
@@ -340,7 +340,7 @@
 
     <!-- VERIFY OTP -->
     <form
-        action="/verify-email-otp"
+        action="/verify-email-otp?_method=PATCH"
         method="POST"
     >
 

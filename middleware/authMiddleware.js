@@ -96,11 +96,38 @@ const disableCache = (
     next();
 };
 
+ const markAuthFlowPage = (req, res, next) => {
+    res.locals.authFlowGuard = true;
+    res.locals.noStorePage = true;
+    next();
+};
 
+ const redirectLoggedInUser = (req, res, next) => {
+    if (req.session?.user) {
+        return res.redirect("/home");
+    }
+
+    next();
+};
+const markAdminAuthPage = (req, res, next) => {
+    if (
+        req.method === "GET" &&
+        req.path === "/login"
+    ) {
+        res.locals.authFlowGuard = true;
+        res.locals.noStorePage = true;
+    }
+
+    next();
+}
 
 export {
     isAuthenticated,
     authenticatedUser,
-    disableCache
+    disableCache,
+    markAuthFlowPage,
+    redirectLoggedInUser,
+    markAdminAuthPage
+    
 };
 
