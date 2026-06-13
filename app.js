@@ -7,8 +7,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 
-import adminRoutes from './routes/adminRoutes.js';
-import userRoutes from './routes/userRoutes.js';
+import adminRoutes from './routes/admin/index.js';
+import userRoutes from './routes/user/index.js';
 import connectDB from './config/db.js';
 import {
     adminSessionConfig,
