@@ -3,9 +3,9 @@ import {
     createAdminSession,
     destroySession
 } from "../../utils/sessionUtils.js";
+import Admin from '../../models/Admin.js'
+import bcrypt from "bcrypt"
 
-const USERNAME = "Manu";
-const PASSWORD = "1234";
 
 /* ---------------- ADMIN LOGIN PAGE ---------------- */
 
@@ -32,48 +32,115 @@ export const getAdminLogin = (req, res) => {
 };
 
 /* ---------------- ADMIN LOGIN POST ---------------- */
+export const postAdminLogin =
+async (req, res) => {
 
-export const postAdminLogin = async (req, res) => {
     try {
-        const { username, password } = req.body;
 
-        if (!username || !password) {
-            return res.render("admin/login", {
-                title: "admin login",
-                cssFile: "adminlogin.css",
-                jsFile: "adminlogin.js",
-                useBootstrap: true,
-                error: "Username and password required"
-            });
-        }
+        const {
+            username,
+            password
+        } = req.body;
 
+        // Empty field check
         if (
-            username === USERNAME &&
-            password === PASSWORD
+            !username ||
+            !password
         ) {
-            await createAdminSession(
-                req,
-                username
-            );
 
-            return res.redirect(
-                "/admin/dashboard"
+            return res.render(
+                "admin/login",
+                {
+                    title:
+                        "admin login",
+
+                    cssFile:
+                        "adminlogin.css",
+
+                    jsFile:
+                        "adminlogin.js",
+
+                    useBootstrap:
+                        true,
+
+                    error:
+                        "Username and password required"
+                }
             );
         }
 
-        return res.render(
-            "admin/auth/login",
-            {
-                title: "admin login",
-                cssFile: "adminlogin.css",
-                jsFile: "adminlogin.js",
-                useBootstrap: true,
-                error:
-                    "Invalid username or password"
-            }
+        // Find admin in DB
+        const admin =
+            await Admin.findOne({
+                username
+            });
+
+        // Admin not found
+        if (!admin) {
+
+            return res.render(
+                "admin/login",
+                {
+                    title:
+                        "admin login",
+
+                    cssFile:
+                        "adminlogin.css",
+
+                    jsFile:
+                        "adminlogin.js",
+
+                    useBootstrap:
+                        true,
+
+                    error:
+                        "Invalid username or password"
+                }
+            );
+        }
+
+        // Compare password
+        const isPasswordMatch =
+            await bcrypt.compare(
+                password,
+                admin.password
+            );
+
+        if (!isPasswordMatch) {
+
+            return res.render(
+                "admin/login",
+                {
+                    title:
+                        "admin login",
+
+                    cssFile:
+                        "adminlogin.css",
+
+                    jsFile:
+                        "adminlogin.js",
+
+                    useBootstrap:
+                        true,
+
+                    error:
+                        "Invalid username or password"
+                }
+            );
+        }
+
+        // Create session
+        await createAdminSession(
+            req,
+            admin.username
+        );
+
+        return res.redirect(
+            "/admin/dashboard"
         );
 
     } catch (error) {
+
         console.log(
             "postAdminLogin error:",
             error
@@ -86,7 +153,6 @@ export const postAdminLogin = async (req, res) => {
             );
     }
 };
-
 /* ---------------- LOGOUT ---------------- */
 
 export const postAdminLogout =
