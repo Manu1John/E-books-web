@@ -193,3 +193,10 @@ body{
         text-align:center;
     }
 }
+
+.error {
+    color: red;
+    font-size: 13px;
+    margin-top: 5px;
+    display: block;
+}

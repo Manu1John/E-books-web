@@ -47,6 +47,7 @@ const getAddAddressPage = (req, res, next) => {
         return res.render("user/addAddress", {
             title: "Add Address",
             cssFile: "addAddress.css",
+            jsFile:"addAddress.js",
             // Safe check: Prevents crashing if req.session is undefined
             user: req.session?.user 
         });
