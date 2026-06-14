@@ -1,9 +1,10 @@
 import express from "express";
-import userController from "../../controlers/userControler.js";
+import passwordControler from "../../controlers/user/passwordControler.js";
 import {
     disableCache,
     markAuthFlowPage,
-    redirectLoggedInUser
+    redirectLoggedInUser,
+    authenticatedUser
 } from "../../middleware/authMiddleware.js";
 
 const router = express.Router();
@@ -13,29 +14,35 @@ router.get(
     markAuthFlowPage,
     disableCache,
     redirectLoggedInUser,
-    userController.getForgotPassword
+    passwordControler.getForgotPassword
 );
 
 router.post(
     "/forgot-password",
     redirectLoggedInUser,
-    userController.postForgotPassword
+    passwordControler.postForgotPassword
 );
 
-
+  
 
 router.get(
     "/reset-password",
     markAuthFlowPage,
     disableCache,
     redirectLoggedInUser,
-    userController.getResetPassword
+    passwordControler.getResetPassword
 );
 
 router.patch(
     "/reset-password",
     redirectLoggedInUser,
-    userController.postResetPassword
+    passwordControler.postResetPassword
+);
+
+router.patch(
+    "/change-password",
+    authenticatedUser,
+    passwordControler.changePassword
 );
 
 export default router;

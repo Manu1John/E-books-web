@@ -1,9 +1,10 @@
 import express from "express";
-import otpControler from "../../controlers/user/otpControler";
+import otpControler from "../../controlers/user/otpControler.js";
 import {
     disableCache,
     markAuthFlowPage,
-    redirectLoggedInUser
+    redirectLoggedInUser,
+    authenticatedUser
 } from "../../middleware/authMiddleware.js";
 
 const router = express.Router();
@@ -35,15 +36,28 @@ router.get(
     markAuthFlowPage,
     disableCache,
     redirectLoggedInUser,
-    userController.getForgotOtpPage
+    otpControler.getForgotOtpPage
 );
 
 router.post(
     "/verify-forgot-otp",
     redirectLoggedInUser,
-    userController.verifyForgotOtp
+    otpControler.verifyForgotOtp
 );
 
-router.post("/resend-forgot-otp", disableCache, redirectLoggedInUser, userController.resendForgotOtp);
+router.post("/resend-forgot-otp", disableCache, redirectLoggedInUser, otpControler.resendForgotOtp);
+
+
+router.post(
+    "/send-email-otp",
+    authenticatedUser,
+    otpControler.sendEmailOtp
+);
+
+router.patch(
+    "/verify-email-otp",
+    authenticatedUser,
+    otpControler.verifyEmailOtp
+);
 
 export default router;

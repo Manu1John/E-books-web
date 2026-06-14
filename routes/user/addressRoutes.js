@@ -1,5 +1,5 @@
 import express from "express";
-import userController from "../../controlers/userControler.js";
+import addressControler from "../../controlers/user/addressControler.js";
 import { authenticatedUser } from "../../middleware/authMiddleware.js";
 
 const router = express.Router();
@@ -7,37 +7,37 @@ const router = express.Router();
 router.get(
     "/address",
     authenticatedUser,
-    userController.getAddressPage
+    addressControler.getAddressPage
 );
 
 router.get(
     "/add-address",
     authenticatedUser,
-    userController.getAddAddressPage
+    addressControler.getAddAddressPage
 );
 
 router.post(
     "/add-address",
     authenticatedUser,
-    userController.addAddress
+    addressControler.addAddress
 );
 
 router.get(
     "/edit-address/:id",
     authenticatedUser,
-    userController.getEditAddress
+    addressControler.getEditAddress
 );
 
 router.put(
     "/edit-address/:id",
     authenticatedUser,
-    userController.updateAddress
+    addressControler.updateAddress
 );
 
 router.delete(
     "/delete-address/:id",
     authenticatedUser,
-    userController.deleteAddress
+    addressControler.deleteAddress
 );
 
 export default router;
