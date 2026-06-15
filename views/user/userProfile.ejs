@@ -202,166 +202,262 @@
                 </button>
 
             </form>
+<!-- PASSWORD & EMAIL -->
+<div class="bottom-grid">
 
-            <!-- PASSWORD & EMAIL -->
-            <div class="bottom-grid">
+    <!-- PASSWORD -->
+    <div class="card">
 
-<!-- PASSWORD -->
-<div class="card">
+        <div class="card-header">
 
-    <h2>Change Password</h2>
+            <h2>
+                Change Password
+            </h2>
 
-    <% if (typeof error !== "undefined" && error) { %>
-        <p class="error-msg">
-            <%= error %>
-        </p>
-    <% } %>
+            <button
+                type="button"
+                id="togglePasswordBtn"
+                class="toggle-btn"
+            >
+                Change Password
+            </button>
 
-    <% if (typeof success !== "undefined" && success) { %>
-        <p class="success-msg">
-            <%= success %>
-        </p>
-    <% } %>
+        </div>
 
-    <form action="/change-password?_method=PATCH" method="POST" id="changePasswordForm">
+        <!-- HIDDEN PASSWORD FORM -->
+        <div
+            id="passwordFormContainer"
+            style="display:none;"
+        >
 
-        <input
-            type="password"
-            name="currentPassword"
-            id="currentPassword"
-            placeholder="Current password"
-            required
-        />
+            <% if (typeof error !== "undefined" && error) { %>
+                <p class="error-msg">
+                    <%= error %>
+                </p>
+            <% } %>
 
-        <div class="two-col">
-            <div>
+            <% if (typeof success !== "undefined" && success) { %>
+                <p class="success-msg">
+                    <%= success %>
+                </p>
+            <% } %>
+
+            <form
+                action="/change-password?_method=PATCH"
+                method="POST"
+                id="changePasswordForm"
+            >
+
                 <input
                     type="password"
-                    name="newPassword"
-                    id="newPassword"
-                    placeholder="New password"
+                    name="currentPassword"
+                    id="currentPassword"
+                    placeholder="Current password"
                     required
                 />
-                <small class="text-danger" id="newPasswordError"></small>
-            </div>
 
-            <div>
+                <div class="two-col">
+
+                    <div>
+
+                        <input
+                            type="password"
+                            name="newPassword"
+                            id="newPassword"
+                            placeholder="New password"
+                            required
+                        />
+
+                        <small
+                            class="text-danger"
+                            id="newPasswordError"
+                        ></small>
+
+                    </div>
+
+                    <div>
+
+                        <input
+                            type="password"
+                            name="confirmPassword"
+                            id="confirmPassword"
+                            placeholder="Confirm password"
+                            required
+                        />
+
+                        <small
+                            class="text-danger"
+                            id="confirmPasswordError"
+                        ></small>
+
+                    </div>
+
+                </div>
+
+                <!-- SHOW PASSWORD -->
+                <div
+                    class="show-password-container"
+                    style="margin:10px 0; display:flex; align-items:center; gap:8px;"
+                >
+
+                    <i
+                        class="fa-solid fa-eye-slash"
+                        id="passwordShow"
+                    ></i>
+
+                    <label>
+                        Show Passwords
+                    </label>
+
+                </div>
+
+                <!-- PASSWORD RULES -->
+                <div class="password-rules">
+
+                    <p>
+                        Password must contain:
+                    </p>
+
+                    <ul>
+
+                        <li
+                            id="lengthRule"
+                            class="invalid"
+                        >
+                            ❌ At least 8 characters
+                        </li>
+
+                        <li
+                            id="upperRule"
+                            class="invalid"
+                        >
+                            ❌ One uppercase letter
+                        </li>
+
+                        <li
+                            id="lowerRule"
+                            class="invalid"
+                        >
+                            ❌ One lowercase letter
+                        </li>
+
+                        <li
+                            id="numberRule"
+                            class="invalid"
+                        >
+                            ❌ One number
+                        </li>
+
+                        <li
+                            id="specialRule"
+                            class="invalid"
+                        >
+                            ❌ One special character
+                        </li>
+
+                    </ul>
+
+                </div>
+
+                <button
+                    type="submit"
+                    id="passwordBtn"
+                >
+                    UPDATE PASSWORD
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <!-- EMAIL -->
+    <div class="card">
+
+        <div class="card-header">
+
+            <h2>
+                Change Email
+            </h2>
+
+            <button
+                type="button"
+                id="toggleEmailBtn"
+                class="toggle-btn"
+            >
+                Change Email
+            </button>
+
+        </div>
+
+        <!-- HIDDEN EMAIL FORM -->
+        <div
+            id="emailFormContainer"
+            style="display:none;"
+        >
+
+            <% if (typeof emailError !== "undefined" && emailError) { %>
+                <p class="error-msg">
+                    <%= emailError %>
+                </p>
+            <% } %>
+
+            <% if (typeof emailSuccess !== "undefined" && emailSuccess) { %>
+                <p class="success-msg">
+                    <%= emailSuccess %>
+                </p>
+            <% } %>
+
+            <!-- SEND OTP -->
+            <form
+                action="/send-email-otp"
+                method="POST"
+            >
+
                 <input
-                    type="password"
-                    name="confirmPassword"
-                    id="confirmPassword"
-                    placeholder="Confirm password"
+                    type="email"
+                    value="<%= user.email %>"
+                    disabled
+                />
+
+                <input
+                    type="email"
+                    name="newEmail"
+                    placeholder="New email"
                     required
                 />
-                <small class="text-danger" id="confirmPasswordError"></small>
-            </div>
+
+                <button type="submit">
+                    Send OTP
+                </button>
+
+            </form>
+
+            <!-- VERIFY OTP -->
+            <form
+                action="/verify-email-otp?_method=PATCH"
+                method="POST"
+            >
+
+                <input
+                    type="text"
+                    name="otp"
+                    placeholder="Enter OTP"
+                    required
+                />
+
+                <button type="submit">
+                    Verify & Update Email
+                </button>
+
+            </form>
+
         </div>
 
-        <div class="show-password-container" style="margin: 10px 0; display: flex; align-items: center; gap: 8px; cursor: pointer;">
-            <i class="fa-solid fa-eye-slash" id="passwordShow"></i>
-            <label style="cursor: pointer; user-select: none;">Show Passwords</label>
-        </div>
-
-        <div class="password-rules">
-            <p>Password must contain:</p>
-            <ul>
-                <li id="lengthRule" class="invalid">
-                    <span class="icon">❌</span>
-                    At least 8 characters
-                </li>
-                <li id="upperRule" class="invalid">
-                    <span class="icon">❌</span>
-                    One uppercase letter
-                </li>
-                <li id="lowerRule" class="invalid">
-                    <span class="icon">❌</span>
-                    One lowercase letter
-                </li>
-                <li id="numberRule" class="invalid">
-                    <span class="icon">❌</span>
-                    One number
-                </li>
-                <li id="specialRule" class="invalid">
-                    <span class="icon">❌</span>
-                    One special character
-                </li>
-            </ul>
-        </div>
-
-        <button type="submit" id="passwordBtn">
-            UPDATE PASSWORD
-        </button>
-
-    </form>
-</div>
-                <!-- EMAIL -->
-<div class="card">
-
-    <h2>
-        Change Email
-    </h2>
-
-    <% if (typeof emailError !== "undefined" && emailError) { %>
-        <p class="error-msg">
-            <%= emailError %>
-        </p>
-    <% } %>
-
-    <% if (typeof emailSuccess !== "undefined" && emailSuccess) { %>
-        <p class="success-msg">
-            <%= emailSuccess %>
-        </p>
-    <% } %>
-
-    <!-- SEND OTP -->
-    <form
-        action="/send-email-otp"
-        method="POST"
-    >
-
-        <input
-            type="email"
-            value="<%= user.email %>"
-            disabled
-        />
-
-        <input
-            type="email"
-            name="newEmail"
-            placeholder="New email"
-            required
-        />
-
-        <button type="submit">
-            Send OTP
-        </button>
-
-    </form>
-
-    <!-- VERIFY OTP -->
-    <form
-        action="/verify-email-otp?_method=PATCH"
-        method="POST"
-    >
-
-        <input
-            type="text"
-            name="otp"
-            placeholder="Enter OTP"
-            required
-        />
-
-        <button type="submit">
-            Verify & Update Email
-        </button>
-
-    </form>
+    </div>
 
 </div>
-
-            </div>
-
-        </div>
 
     </div>
 

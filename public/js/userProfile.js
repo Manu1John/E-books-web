@@ -180,3 +180,53 @@ function toggleVissiblity(){
             confirmPassword.type ="password"
     } 
 }
+
+// PASSWORD TOGGLE
+const togglePasswordBtn =
+    document.getElementById(
+        "togglePasswordBtn"
+    );
+
+const passwordFormContainer =
+    document.getElementById(
+        "passwordFormContainer"
+    );
+
+togglePasswordBtn?.addEventListener(
+    "click",
+    () => {
+
+        passwordFormContainer
+            .style.display =
+            passwordFormContainer
+                .style.display ===
+            "none"
+                ? "block"
+                : "none";
+    }
+);
+
+// EMAIL TOGGLE
+const toggleEmailBtn =
+    document.getElementById(
+        "toggleEmailBtn"
+    );
+
+const emailFormContainer =
+    document.getElementById(
+        "emailFormContainer"
+    );
+
+toggleEmailBtn?.addEventListener(
+    "click",
+    () => {
+
+        emailFormContainer
+            .style.display =
+            emailFormContainer
+                .style.display ===
+            "none"
+                ? "block"
+                : "none";
+    }
+);

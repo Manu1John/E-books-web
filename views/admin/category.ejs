@@ -1,0 +1,115 @@
+<%- include('../partials/header') %>
+<div class="container">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+        <h1 class="logo">Admin Panel</h1>
+
+        <ul class="menu">
+            <li><a href="/admin/dashboard">Dashboard</a></li>
+            <li><a href="#">Reports</a></li>
+            <li><a href="#">Products</a></li>
+            <li><a href="#">Orders</a></li>
+            <li><a href="#">Offers</a></li>
+            <li><a href="#">Coupons</a></li>
+            <li><a href="#">Categories</a></li>
+        </ul>
+
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Top Navbar -->
+        <div class="top-bar">
+
+            <form
+                action=""
+                method="GET"
+                
+            >
+
+                <div class="search-box">
+
+                    <i class="fa fa-search"></i>
+
+                    <input
+                        type="text"
+                        
+                        name="search"
+                        placeholder="Search by email or name"
+                        value=""
+                    >
+                        <button
+                            type="button"
+                           
+                            class="clear-btn"
+                        >
+                            ✖
+                        </button>
+
+
+                </div>
+
+            </form>
+
+            <form
+                action="/admin/logout"
+                method="POST"
+            >
+                <button class="logout-btn">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    Logout
+                </button>
+            </form>
+
+        </div>
+        <form action="/admin/add-category" method="get">
+                <button class="addCategory-btn">
+                    Add Category
+                </button>
+        <h2 class="page-title">
+            Categories
+        </h2>
+
+        <h5 class="page-users-count">
+            
+        </h5>
+
+        <!-- Table -->
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Categories</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <%cat.forEach((category,index)=>{%>
+                    <tr>
+                        <td><%= index + 1 %></td>
+                        <td><%=category.name%></td>
+                        <td><%=category.description%></td>
+                        <td><%=category.status%></td>
+                        <td>bb</td>
+                    </tr>
+                    <%})%>
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </main>
+
+</div>
+
+<%- include('../partials/footer') %>

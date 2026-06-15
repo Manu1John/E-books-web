@@ -350,3 +350,15 @@ textarea{
     color: red;
     font-size: 13px;
 }
+.card-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.toggle-btn{
+    padding:10px 15px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
