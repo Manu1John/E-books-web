@@ -5,11 +5,13 @@ const  getCategoryDashboard =async (req,res)=>{
         const page =parseInt(req.query.page)||1
         const limit = 4
         const skip = (page-1)*limit
-        const categoryData = await Category.find({})
+        const categoryData = await Category.find({
+            isDeleted: false
+        })
         .sort({createdAt:-1})
         .skip(skip)
         .limit(limit)
-        const totalCategories = await Category.countDocuments()
+        const totalCategories = await Category.countDocuments({isDeleted: false})
         const totalPages = Math.ceil(totalCategories/limit)
          return res.render("admin/category",{
                     title:
@@ -72,9 +74,112 @@ const addCategory = async (req,res)=>{
     }
 }
 
+const getEditCategory = async (req, res) => {
+    try {
+
+        const { id } = req.params;
+
+        const category = await Category.findById(id);
+
+        if (!category) {
+            return res.status(404).send("Category not found");
+        }
+
+        return res.render("admin/editCategory", {
+            title: "Edit Category",
+            cssFile: "addCategory.css",
+            jsFile: "editCategory.js",
+            category
+        });
+
+    } catch (error) {
+        console.log("GET EDIT CATEGORY ERROR:", error);
+
+        return res.status(500).send("Internal server error");
+    }
+};
+
+
+const postEditCategory = async (req, res) => {
+    try {
+
+        const { id } = req.params;
+        const { name, description, status } = req.body;
+
+        // Check duplicate category name
+        const existingCategory = await Category.findOne({
+            name: name.trim(),
+            _id: { $ne: id }
+        });
+
+        if (existingCategory) {
+            return res.render("admin/editCategory", {
+                title: "Edit Category",
+                cssFile: "addCategory.css",
+                jsFile: "editCategory.js",
+                error: "Category already exists",
+                category: {
+                    _id: id,
+                    name,
+                    description,
+                    status
+                }
+            });
+        }
+
+        await Category.findByIdAndUpdate(id, {
+            name: name.trim(),
+            description,
+            status
+        });
+
+        return res.redirect("/admin/category");
+
+    } catch (error) {
+        console.log("POST EDIT CATEGORY ERROR:", error);
+
+        return res.status(500).send("Internal server error");
+    }
+};
+
+
+const softDeleteCategory = async (req, res) => {
+    try {
+
+        const { id } = req.params;
+
+        await Category.findByIdAndUpdate(
+            id,
+            {
+                isDeleted: true
+            }
+        );
+
+        return res.json({
+            success: true,
+            message: "Category deleted successfully"
+        });
+
+    } catch (error) {
+
+        console.log(
+            "SOFT DELETE ERROR:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong"
+        });
+    }
+};
+
 
 export default{
     getCategoryDashboard,
     getAddCategory,
-    addCategory
+    addCategory,
+    getEditCategory,
+    postEditCategory,
+    softDeleteCategory
 }

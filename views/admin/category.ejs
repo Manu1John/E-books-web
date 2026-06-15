@@ -69,6 +69,8 @@
                 <button class="addCategory-btn">
                     Add Category
                 </button>
+        </form>
+
         <h2 class="page-title">
             Categories
         </h2>
@@ -99,7 +101,27 @@
                         <td><%=category.name%></td>
                         <td><%=category.description%></td>
                         <td><%=category.status%></td>
-                        <td>bb</td>
+
+<td class="action-buttons">
+
+    <a
+        href="/admin/edit-category/<%= category._id %>"
+        class="editCategory-btn"
+    >
+        Edit
+    </a>
+
+    <button
+    type="button"
+        class="delete-btn"
+        onclick="deleteCategory('<%= category._id %>')"
+    >
+        Delete
+    </button>
+
+</td>
+
+
                     </tr>
                     <%})%>
                 </tbody>

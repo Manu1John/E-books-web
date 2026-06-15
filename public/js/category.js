@@ -49,3 +49,37 @@
         );
 
     }
+
+///confirmation for asking soft delete category
+async function deleteCategory(id) {
+
+    const confirmDelete = confirm(
+        "Are you sure you want to delete this category?"
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+
+        const response = await fetch(
+            `/admin/delete-category/${id}`,
+            {
+                method: "POST"
+            }
+        );
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert("Category deleted successfully");
+            location.reload();
+        } else {
+            alert(data.message);
+        }
+
+    } catch (error) {
+        console.log("dELETE ERROR",error);
+        alert("Something went wrong");
+    }
+}
+
