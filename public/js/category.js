@@ -50,36 +50,39 @@
 
     }
 
-///confirmation for asking soft delete category
-async function deleteCategory(id) {
+///
+// Attach it to the window object so your HTML button can find it
 
-    const confirmDelete = confirm(
-        "Are you sure you want to delete this category?"
+   
+///search by category
+
+const searchInput =
+    document.getElementById(
+        "searchInput"
     );
 
-    if (!confirmDelete) return;
+let timer;
 
-    try {
+if (searchInput) {
 
-        const response = await fetch(
-            `/admin/delete-category/${id}`,
-            {
-                method: "POST"
-            }
-        );
+    searchInput.addEventListener(
+        "keyup",
+        function () {
 
-        const data = await response.json();
+            clearTimeout(timer);
 
-        if (data.success) {
-            alert("Category deleted successfully");
-            location.reload();
-        } else {
-            alert(data.message);
+            timer =
+                setTimeout(() => {
+
+                    const value =
+                        searchInput.value.trim();
+
+                    window.location.href =
+                        `/admin/category?search=${value}`;
+
+                }, 500);
+
         }
-
-    } catch (error) {
-        console.log("dELETE ERROR",error);
-        alert("Something went wrong");
-    }
+    );
 }
 

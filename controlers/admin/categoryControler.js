@@ -1,38 +1,83 @@
 import Category from "../../models/category.js"
+import { softDelete } from '../../services/categoryService.js'
+const getCategoryDashboard = async (req, res) => {
+    try {
 
-const  getCategoryDashboard =async (req,res)=>{
-    try{
-        const page =parseInt(req.query.page)||1
-        const limit = 4
-        const skip = (page-1)*limit
-        const categoryData = await Category.find({
+        const page =
+            parseInt(req.query.page) || 1;
+
+        const limit = 4;
+
+        const skip =
+            (page - 1) * limit;
+
+        const search =
+            req.query.search?.trim() || "";
+
+        // Base query
+        const query = {
             isDeleted: false
-        })
-        .sort({createdAt:-1})
-        .skip(skip)
-        .limit(limit)
-        const totalCategories = await Category.countDocuments({isDeleted: false})
-        const totalPages = Math.ceil(totalCategories/limit)
-         return res.render("admin/category",{
-                    title:
+        };
+
+        // Add search only if user typed
+        if (search) {
+            query.name = {
+                $regex: search,
+                $options: "i"
+            };
+        }
+
+        const categoryData =
+            await Category.find(query)
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit);
+
+        const totalCategories =
+            await Category.countDocuments(
+                query
+            );
+
+        const totalPages =
+            Math.ceil(
+                totalCategories / limit
+            );
+
+        return res.render(
+            "admin/category",
+            {
+                title:
                     "category management",
+
                 cssFile:
                     "category.css",
+
                 jsFile:
                     "category.js",
 
-                    cat:categoryData,
-                    currentPage:page,
-                    totalPages,
-                    totalCategories
+                cat: categoryData,
+                currentPage: page,
+                totalPages,
+                totalCategories,
+                search
+            }
+        );
 
+    } catch (error) {
 
-        })
-    }catch(error){
-        console.log("get category dashboard error",error)
-        return res.status(500).send("something went wrong")
+        console.log(
+            "get category dashboard error",
+            error
+        );
+
+        return res
+            .status(500)
+            .send(
+                "something went wrong"
+            );
     }
-}
+};
+
 
 const getAddCategory = async(req,res)=>{
     try {
@@ -141,39 +186,33 @@ const postEditCategory = async (req, res) => {
         return res.status(500).send("Internal server error");
     }
 };
-
-
 const softDeleteCategory = async (req, res) => {
     try {
-
         const { id } = req.params;
 
-        await Category.findByIdAndUpdate(
-            id,
-            {
-                isDeleted: true
-            }
-        );
+        // FIX: Called the imported function directly instead of using categoryService.softDelete
+        const category = await softDelete(id);
 
-        return res.json({
+        if (!category) {
+            return res.status(404).json({
+                success: false,
+                message: "Category not found"
+            });
+        }
+
+        return res.status(200).json({
             success: true,
-            message: "Category deleted successfully"
+            message: "Deleted successfully"
         });
 
     } catch (error) {
-
-        console.log(
-            "SOFT DELETE ERROR:",
-            error
-        );
-
+        console.error("DELETE ERROR:", error);
         return res.status(500).json({
             success: false,
-            message: "Something went wrong"
+            message: "Server error"
         });
     }
 };
-
 
 export default{
     getCategoryDashboard,
