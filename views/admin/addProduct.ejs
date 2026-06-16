@@ -1,0 +1,186 @@
+<%- include('../partials/header') %>
+
+<link rel="stylesheet" href="/css/add-product.css">
+
+<div class="page-wrapper">
+
+    <div class="product-layout">
+
+        <!-- LEFT SIDE -->
+        <div class="product-card">
+
+            <h2>Product Information</h2>
+
+            <form action="/admin/add-product" method="POST">
+
+                <!-- Product Name -->
+                <div class="form-group">
+                    <label>Product Name <span>*</span></label>
+                    <input
+                        type="text"
+                        name="title"
+                        placeholder="Enter product name"
+                        required
+                    >
+                </div>
+
+                <!-- Category -->
+                <div class="form-group">
+                    <label>Category <span>*</span></label>
+
+                    <select name="category" required>
+                        <option value="">Select category</option>
+                        <%categories.forEach(category=>{%>
+                        <option value="<%=category._id%>"><%=category.name%></option>
+                        <%})%>
+                    </select>
+                </div>
+
+                <!-- Author -->
+                <div class="form-group">
+                    <label>Author <span>*</span></label>
+
+                    <input
+                        type="text"
+                        name="author"
+                        placeholder="Enter author name"
+                        required
+                    >
+                </div>
+
+                <!-- Description -->
+                <div class="form-group">
+                    <label>Description <span>*</span></label>
+
+                    <textarea
+                        name="description"
+                        rows="5"
+                        placeholder="Enter product description"
+                        required
+                    ></textarea>
+                </div>
+
+                <!-- PRICE & STOCK -->
+                <div class="row">
+
+                    <div class="form-group">
+                        <label>Price <span>*</span></label>
+
+                        <div class="input-box">
+                            <span>$</span>
+                            <input
+                                type="number"
+                                name="price"
+                                placeholder="Enter price"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Stock <span>*</span></label>
+
+                        <input
+                            type="number"
+                            name="quantity"
+                            placeholder="Enter stock"
+                            required
+                        >
+                    </div>
+
+                </div>
+                
+            <div class="form-group">
+                <label>Status</label>
+
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input
+                            type="radio"
+                            name="status"
+                            value="active"
+                            checked
+                        />
+                        Active
+                    </label>
+
+                    <label class="radio-option">
+                        <input
+                            type="radio"
+                            name="status"
+                            value="inactive"
+                        />
+                        Not Active
+                    </label>
+                </div>
+            </div>
+
+
+                <!-- BUTTONS -->
+                <div class="button-group">
+
+                    <button type="submit" class="save-btn">
+                        Save Product
+                    </button>
+            <button 
+                type="button" 
+                class="reset-btn"
+                onclick="window.location.href='/admin/products'"
+            >
+                Cancel
+            </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="sidebar-card">
+
+            <!-- Upload Box -->
+            <div class="upload-card">
+
+                <h3>Product Image</h3>
+
+                <div class="upload-box">
+
+                    <div class="upload-icon">
+                        ☁
+                    </div>
+
+                    <h4>Upload Product Image</h4>
+
+                    <p>or paste image URL</p>
+
+                    <small>
+                        Recommended size: 800x800px <br>
+                        JPG, PNG or WEBP
+                    </small>
+
+                </div>
+            </div>
+
+            <!-- QUICK TIPS -->
+            <div class="tips-card">
+
+                <h3>💡 Quick Tips</h3>
+
+                <ul>
+                    <li>Enter accurate product information</li>
+                    <li>Add high quality product image</li>
+                    <li>Set proper price and stock</li>
+                    <li>Add comma separated data</li>
+                    <li>All required fields are mandatory</li>
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<%- include('../partials/footer') %>

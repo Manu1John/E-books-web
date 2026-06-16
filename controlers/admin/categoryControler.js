@@ -203,6 +203,7 @@ const softDeleteCategory = async (req, res) => {
         return res.status(200).json({
             success: true,
             message: "Deleted successfully"
+            
         });
 
     } catch (error) {
