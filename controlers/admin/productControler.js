@@ -1,8 +1,8 @@
 import Product from '../../models/products.js';
 import Category
 from "../../models/category.js";
-
-
+import productService from '../../services/productService.js';
+import fs from 'fs'
 const getProductDashboard =
 async (req, res) => {
 
@@ -119,6 +119,8 @@ async (req,res)=>{
                     "add products",
                 cssFile:
                     "addProducts.css",
+                jsFile:
+                    "addProdcuts.js",
                 categories
             }
         );
@@ -132,77 +134,37 @@ async (req,res)=>{
         });
     }
 }
-
-const postAddProductPage =
-async (req, res) => {
-
+const postAddProductPage = async (req, res) => {
     try {
+        // 1. Pass the form body data and Multer files to your service layer
+        await productService.createProduct(req.body, req.files);
+        
+        console.log("Product Saved Successfully!");
 
-        const {
-            title,
-            category,
-            author,
-            description,
-            price,
-            quantity,
-            status
-        } = req.body;
-
-        console.log(req.body);
-
-        const existProduct =
-            await Product.findOne({
-                title:
-                    title.trim()
-            });
-
-        if (existProduct) {
-
-            return res.render(
-                "admin/addProduct",
-                {
-                    title:
-                        "add products",
-                    cssFile:
-                        "addProducts.css",
-                    error:
-                        "Product already exists"
-                }
-            );
-        }
-
-        const newProduct =
-            new Product({
-                title:
-                    title.trim(),
-                category,
-                author,
-                description,
-                price,
-                quantity,
-                status
-            });
-
-        await newProduct.save();
-
-        console.log(
-            "Product Saved"
-        );
-
-        return res.redirect(
-            "/admin/products"
-        );
+        // 2. Since frontend always uses fetch(), ALWAYS reply with clean JSON
+        return res.status(200).json({ 
+            success: true, 
+            redirectUrl: "/admin/products" 
+        });
 
     } catch (error) {
+        console.error("Backend Error caught in controller:", error.message);
+        
+        // 3. File Cleanup: Delete files Multer just saved so they don't clutter your disk
+        if (req.files && req.files.length > 0) {
+            req.files.forEach(file => {
+                fs.unlink(file.path, (err) => {
+                    if (err) console.error("Error clearing orphan file during crash:", err);
+                });
+            });
+        }
 
-        console.log(error);
-
-        return res.status(500).json({
-            error:
-                error.message
-        });
+        // 4. Send the clean error message directly back to the frontend fetch script
+        return res.status(400).json({ error: error.message });
     }
 };
+
+
 
 export default {
     getProductDashboard,

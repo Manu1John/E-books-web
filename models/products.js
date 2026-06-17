@@ -31,7 +31,7 @@ const productSchema = new mongoose.Schema(
 
     images: {
       type: [String], // FIXED: supports multiple images
-      default: []
+      required:true
     },
 
     quantity: {

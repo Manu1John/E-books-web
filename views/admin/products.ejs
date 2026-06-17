@@ -2,7 +2,6 @@
 
 <div class="container">
 
-    <!-- Sidebar -->
     <aside class="sidebar">
         <h1 class="logo">Admin Panel</h1>
 
@@ -17,41 +16,33 @@
         </ul>
     </aside>
 
-    <!-- Main Content -->
     <main class="main-content">
 
-        <!-- Top Bar -->
         <div class="top-bar">
 
-<form
-    action="/admin/products"
-    method="GET"
-    id="searchForm"
->
-
-    <div class="search-box">
-
-        <i class="fa fa-search"></i>
-
-        <input
-            type="text"
-            name="search"
-            id="searchInput"
-            placeholder="Search product..."
-            value="<%= search || '' %>"
-        >
-
-        <button
-            type="button"
-            class="clear-btn"
-            id="clearButton"
-        >
-            ✖
-        </button>
-
-    </div>
-
-</form>
+            <form
+                action="/admin/products"
+                method="GET"
+                id="searchForm"
+            >
+                <div class="search-box">
+                    <i class="fa fa-search"></i>
+                    <input
+                        type="text"
+                        name="search"
+                        id="searchInput"
+                        placeholder="Search product..."
+                        value="<%= search || '' %>"
+                    >
+                    <button
+                        type="button"
+                        class="clear-btn"
+                        id="clearButton"
+                    >
+                        ✖
+                    </button>
+                </div>
+            </form>
 
             <form action="/admin/logout" method="POST">
                 <button class="logout-btn">
@@ -61,14 +52,11 @@
 
         </div>
 
-        <!-- Header -->
         <div class="page-header">
             <h2 class="page-title">Products</h2>
             <a href="/admin/add-product"><button class="add-btn">Add Product</button></a>
-            
         </div>
 
-        <!-- Table -->
         <div class="table-container">
             <table>
                 <thead>
@@ -84,116 +72,95 @@
                     </tr>
                 </thead>
 
-            <tbody>
+                <tbody>
+                    <% if(pro.length > 0){ %>
+                        <% pro.forEach((product, index) => { %>
+                        <tr>
+                            <td>
+                                <%= (currentPage - 1) * 4 + index + 1 %>
+                            </td>
 
-    <% if(pro.length > 0){ %>
+                            <td>
+                                <% if (product.images && product.images.length > 0) { %>
+                                    <img
+                                        src="/uploads/<%= product.images[0] %>"
+                                        alt="<%= product.title %>"
+                                        style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;"
+                                    >
+                                <% } else { %>
+                                    <img
+                                        src="https://via.placeholder.com/60"
+                                        alt="No image available"
+                                        style="width: 60px; height: 60px; object-fit: cover; opacity: 0.5;"
+                                    >
+                                <% } %>
+                            </td>
 
-        <% pro.forEach((product, index) => { %>
+                            <td>
+                                <%= product.title %>
+                            </td>
 
-        <tr>
+                            <td>
+                                <%= product.category?.name || "No Category" %>
+                            </td>
 
-            <td>
-                <%= (currentPage - 1) * 4 + index + 1 %>
-            </td>
+                            <td>
+                                <%= product.author %>
+                            </td>
 
-            <td>
-                <img
-                    src="https://via.placeholder.com/60"
-                    alt="product image"
-                >
-            </td>
+                            <td>
+                                ₹<%= product.price %>
+                            </td>
 
-            <td>
-                <%= product.title %>
-            </td>
+                            <td>
+                                <%= product.quantity %>
+                            </td>
 
-            <td>
-                <%= product.category?.name || "No Category" %>
-            </td>
-
-            <td>
-                <%= product.author %>
-            </td>
-
-            <td>
-                ₹<%= product.price %>
-            </td>
-
-            <td>
-                <%= product.quantity %>
-            </td>
-
-            <td>
-                <button class="edit">
-                    Edit
-                </button>
-
-                <button class="delete">
-                    Delete
-                </button>
-            </td>
-
-        </tr>
-
-        <% }) %>
-
-    <% } else { %>
-
-        <tr>
-            <td colspan="8">
-                No products found
-            </td>
-        </tr>
-
-    <% } %>
-
-</tbody>
+                            <td>
+                                <button class="edit">
+                                    Edit
+                                </button>
+                                <button class="delete">
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="8">
+                                No products found
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
             </table>
-            <!-- PAGINATION -->
-<div class="pagination">
 
-    <% if(currentPage > 1){ %>
+            <div class="pagination">
+                <% if(currentPage > 1){ %>
+                    <a href="/admin/products?page=<%= currentPage - 1 %>&search=<%= search %>">
+                        Prev
+                    </a>
+                <% } %>
 
-        <a
-            href="/admin/products?page=<%= currentPage - 1 %>&search=<%= search %>"
-        >
-            Prev
-        </a>
+                <% for(let i = 1; i <= totalPages; i++){ %>
+                    <a
+                        href="/admin/products?page=<%= i %>&search=<%= search %>"
+                        class="<%= currentPage === i ? 'active-page' : '' %>"
+                    >
+                        <%= i %>
+                    </a>
+                <% } %>
 
-    <% } %>
-
-
-    <% for(let i = 1; i <= totalPages; i++){ %>
-
-        <a
-            href="/admin/products?page=<%= i %>&search=<%= search %>"
-
-            class="
-            <%= currentPage === i
-            ? 'active-page'
-            : ''
-            %>"
-        >
-            <%= i %>
-        </a>
-
-    <% } %>
-
-
-    <% if(currentPage < totalPages){ %>
-
-        <a
-            href="/admin/products?page=<%= currentPage + 1 %>&search=<%= search %>"
-        >
-            Next
-        </a>
-
-    <% } %>
-
-</div>
+                <% if(currentPage < totalPages){ %>
+                    <a href="/admin/products?page=<%= currentPage + 1 %>&search=<%= search %>">
+                        Next
+                    </a>
+                <% } %>
+            </div>
         </div>
 
-    </main>
+    </main> 
 
 </div>
 

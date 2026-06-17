@@ -1,8 +1,12 @@
-
 @import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
 
+/* =========================
+   BASE RESET
+========================= */
 * {
 	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
 }
 
 body {
@@ -12,10 +16,13 @@ body {
 	align-items: center;
 	flex-direction: column;
 	font-family: 'Montserrat', sans-serif;
-	height: 100vh;
-	margin: -20px 0 50px;
+	min-height: 100vh;
+	padding: 20px;
 }
 
+/* =========================
+   TEXT
+========================= */
 h1 {
 	font-weight: bold;
 	margin: 0;
@@ -44,6 +51,9 @@ a {
 	margin: 15px 0;
 }
 
+/* =========================
+   BUTTONS
+========================= */
 button {
 	border-radius: 20px;
 	border: 1px solid #FF4B2B;
@@ -55,6 +65,7 @@ button {
 	letter-spacing: 1px;
 	text-transform: uppercase;
 	transition: transform 80ms ease-in;
+	cursor: pointer;
 }
 
 button:active {
@@ -70,30 +81,14 @@ button.ghost {
 	border-color: #FFFFFF;
 }
 
-form {
-	background-color: #FFFFFF;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex-direction: column;
-	padding: 0 50px;
-	height: 100%;
-	text-align: center;
-}
-
-input {
-	background-color: #eee;
-	border: none;
-	padding: 12px 15px;
-	margin: 4px 0;
-	width: 100%;
-}
-
+/* =========================
+   CONTAINER (MAIN SLIDER)
+========================= */
 .container {
 	background-color: #fff;
 	border-radius: 10px;
-  	box-shadow: 0 14px 28px rgba(0,0,0,0.25), 
-			0 10px 10px rgba(0,0,0,0.22);
+	box-shadow: 0 14px 28px rgba(0,0,0,0.25),
+	            0 10px 10px rgba(0,0,0,0.22);
 	position: relative;
 	overflow: hidden;
 	width: 768px;
@@ -101,6 +96,9 @@ input {
 	min-height: 480px;
 }
 
+/* =========================
+   FORM CONTAINERS
+========================= */
 .form-container {
 	position: absolute;
 	top: 0;
@@ -108,6 +106,7 @@ input {
 	transition: all 0.6s ease-in-out;
 }
 
+/* SIGN IN */
 .sign-in-container {
 	left: 0;
 	width: 50%;
@@ -118,6 +117,7 @@ input {
 	transform: translateX(100%);
 }
 
+/* SIGN UP */
 .sign-up-container {
 	left: 0;
 	width: 50%;
@@ -132,18 +132,21 @@ input {
 	animation: show 0.6s;
 }
 
+/* animation */
 @keyframes show {
 	0%, 49.99% {
 		opacity: 0;
 		z-index: 1;
 	}
-	
 	50%, 100% {
 		opacity: 1;
 		z-index: 5;
 	}
 }
 
+/* =========================
+   OVERLAY
+========================= */
 .overlay-container {
 	position: absolute;
 	top: 0;
@@ -155,13 +158,11 @@ input {
 	z-index: 100;
 }
 
-.container.right-panel-active .overlay-container{
+.container.right-panel-active .overlay-container {
 	transform: translateX(-100%);
 }
 
 .overlay {
-	background: #FF416C;
-	background: -webkit-linear-gradient(to right, #FF4B2B, #FF416C);
 	background: linear-gradient(to right, #FF4B2B, #FF416C);
 	background-repeat: no-repeat;
 	background-size: cover;
@@ -171,14 +172,14 @@ input {
 	left: -100%;
 	height: 100%;
 	width: 200%;
-  	transform: translateX(0);
 	transition: transform 0.6s ease-in-out;
 }
 
 .container.right-panel-active .overlay {
-  	transform: translateX(50%);
+	transform: translateX(50%);
 }
 
+/* overlay panels */
 .overlay-panel {
 	position: absolute;
 	display: flex;
@@ -190,7 +191,6 @@ input {
 	top: 0;
 	height: 100%;
 	width: 50%;
-	transform: translateX(0);
 	transition: transform 0.6s ease-in-out;
 }
 
@@ -211,6 +211,31 @@ input {
 	transform: translateX(20%);
 }
 
+/* =========================
+   FORM ELEMENTS
+========================= */
+form {
+	background-color: #FFFFFF;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	padding: 0 50px;
+	height: 100%;
+	text-align: center;
+}
+
+input {
+	background-color: #eee;
+	border: none;
+	padding: 12px 15px;
+	margin: 4px 0;
+	width: 100%;
+}
+
+/* =========================
+   SOCIAL BUTTONS
+========================= */
 .social-container {
 	margin: 20px 0;
 }
@@ -226,50 +251,86 @@ input {
 	width: 40px;
 }
 
+/* =========================
+   FOOTER
+========================= */
 footer {
-    background-color: #222;
-    color: #fff;
-    font-size: 14px;
-    bottom: 0;
-    position: fixed;
-    left: 0;
-    right: 0;
-    text-align: center;
-    z-index: 999;
+	background-color: #222;
+	color: #fff;
+	font-size: 14px;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	text-align: center;
+	z-index: 999;
 }
 
 footer p {
-    margin: 10px 0;
+	margin: 10px 0;
 }
 
 footer i {
-    color: red;
+	color: red;
 }
 
 footer a {
-    color: #3c97bf;
-    text-decoration: none;
+	color: #3c97bf;
+	text-decoration: none;
 }
-/* =========================
-   RESPONSIVE DESIGN
-========================= */
 
+/* =========================
+   ERROR TEXT
+========================= */
+small {
+	color: red;
+}
+
+/* =========================
+   PASSWORD FIELD
+========================= */
+.password-container {
+	position: relative;
+	width: 100%;
+	margin: 4px 0;
+}
+
+.password-container input {
+	width: 100%;
+	padding-right: 45px;
+}
+
+.eye-icon {
+	position: absolute;
+	right: 15px;
+	top: 50%;
+	transform: translateY(-50%);
+	cursor: pointer;
+	color: #666;
+	font-size: 16px;
+}
+
+.eye-icon:hover {
+	color: #FF4B2B;
+}
+
+/* =========================
+   RESPONSIVE (FIXED)
+========================= */
 @media screen and (max-width: 768px) {
 
 	body {
-		height: auto;
-		margin: 20px 0;
+		display: block;
 		padding: 20px;
+		height: auto;
 	}
 
 	.container {
 		width: 100%;
-		min-height: 900px;
-		height: auto;
-		display: flex;
-		flex-direction: column;
+		min-height: auto;
 	}
 
+	/* disable slider ONLY for mobile safely */
 	.form-container {
 		position: relative;
 		width: 100%;
@@ -280,7 +341,6 @@ footer a {
 	.sign-up-container {
 		width: 100%;
 		position: relative;
-		left: 0;
 		opacity: 1;
 		transform: none !important;
 		z-index: 1;
@@ -295,18 +355,8 @@ footer a {
 		height: auto;
 	}
 
-	input {
-		width: 100%;
-	}
-
-	button {
-		width: auto;
-	}
-
 	footer {
 		position: relative;
-		margin-top: 20px;
-		padding: 10px;
 	}
 }
 
@@ -326,7 +376,6 @@ footer a {
 	}
 
 	input {
-		padding: 10px 12px;
 		font-size: 14px;
 	}
 
@@ -339,36 +388,4 @@ footer a {
 		width: 35px;
 		height: 35px;
 	}
-}
-
-small{
-    color: red;
-}
-
-/* PASSWORD EYE ICON */
-
-.password-container {
-    position: relative;
-    width: 100%;
-    margin: 4px 0;
-}
-
-.password-container input {
-    width: 100%;
-    padding-right: 45px; /* space for eye icon */
-}
-
-.eye-icon {
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #666;
-    font-size: 16px;
-    z-index: 10;
-}
-
-.eye-icon:hover {
-    color: #FF4B2B;
 }
