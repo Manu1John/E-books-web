@@ -117,10 +117,13 @@
                             </td>
 
                             <td>
-                                <button class="edit">
-                                    Edit
-                                </button>
-                                <button class="delete">
+                                <a style="text-decoration: none;" href="/admin/edit-product/<%=product._id%>">
+                                    <button class="edit">
+                                        Edit
+                                    </button>
+                                </a>
+                                
+                                <button type="button" class="delete-product-btn" data-id="<%= product._id %>">
                                     Delete
                                 </button>
                             </td>
@@ -163,5 +166,44 @@
     </main> 
 
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('click', async function (e) {
+        // Find if the clicked element or its closest parent is our target delete button
+        const button = e.target.closest('.delete-product-btn');
+        if (!button) return; // Exit if they clicked something else
+
+        e.preventDefault();
+
+        const productId = button.getAttribute('data-id');
+        
+        const confirmDelete = confirm("Are you sure you want to soft-delete this product? It will be hidden from the storefront.");
+        if (!confirmDelete) return; 
+
+        try {
+            const response = await fetch(`/admin/delete-product/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Instantly update layout by navigating where backend tells us
+                window.location.href = data.redirectUrl || '/admin/products';
+            } else {
+                alert("Failed to delete: " + (data.error || "Unknown server error"));
+            }
+
+        } catch (error) {
+            console.error("Deletion Fetch Error:", error);
+            alert("A network error occurred while trying to delete the product.");
+        }
+    });
+});
+</script>
 
 <%- include('../partials/footer') %>

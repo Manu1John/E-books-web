@@ -163,11 +163,99 @@ const postAddProductPage = async (req, res) => {
         return res.status(400).json({ error: error.message });
     }
 };
+const getEditProduct = async (req, res) => {
+    try {
+        const productId = req.params.id;
+        const product = await Product.findById(productId).populate('category');
+        const categories = await Category.find({});
 
+        if (!product) {
+            return res.redirect('/admin/products');
+        }
 
+        // Render your new edit view, passing the existing data
+        res.render('admin/editProduct',{
+            title:"edit product",
+            cssFile:'editProduct.css',
+            jsFile:'editProducts.js',
+             product, 
+             categories });
+    } catch (error) {
+        console.error("Error loading edit page:", error);
+        res.status(500).send("Internal Server Error");
+    }
+};
+const postEditProduct = async (req, res) => {
+    try {
+        const productId = req.params.id;
+        const { title, category, author, description, price, quantity, status } = req.body;
+
+        // 1. Find the current book data first
+        const currentProduct = await Product.findById(productId);
+        if (!currentProduct) {
+            return res.status(404).json({ error: "Product not found" });
+        }
+
+        // 2. Decide on images: use new ones if uploaded, otherwise keep old ones
+        let finalImages = currentProduct.images; 
+        if (req.files && req.files.length > 0) {
+            finalImages = req.files.map(file => file.filename);
+        }
+
+        // 3. Update the database record cleanly
+        await Product.findByIdAndUpdate(productId, {
+            title,
+            category,
+            author,
+            description,
+            price,
+            quantity,
+            status,
+            images: finalImages
+        });
+
+        // 🎉 FIXED: Send a success JSON packet back to the fetch request!
+        return res.json({ redirectUrl: "/admin/products" });
+
+    } catch (error) {
+        console.error("Backend Edit Error:", error);
+        return res.status(500).json({ error: "Failed to update product details." });
+    }
+};
+
+const softDeleteProduct = async (req, res) => {
+    try {
+        const productId = req.params.id;
+
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ error: "Product not found" });
+        }
+
+        // Apply soft delete flags
+        await Product.findByIdAndUpdate(productId, {
+            isDeleted: true,
+            deletedAt: new Date()
+        });
+
+        // ✅ Return clean JSON to the frontend fetch execution sequence
+        return res.json({ 
+            success: true, 
+            message: "Product soft-deleted successfully.",
+            redirectUrl: "/admin/products" 
+        });
+
+    } catch (error) {
+        console.error("Soft Delete Error:", error);
+        return res.status(500).json({ error: "Server error during product removal." });
+    }
+};
 
 export default {
     getProductDashboard,
     getaddProductPage,
-    postAddProductPage
+    postAddProductPage,
+    getEditProduct,
+    postEditProduct,
+    softDeleteProduct
 }
