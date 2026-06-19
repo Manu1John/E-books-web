@@ -25,13 +25,37 @@ async (req, res) => {
         };
 
         // SEARCH
-        if (search) {
+if (search) {
 
-            query.title = {
+    const categories = await Category.find({
+        name: {
+            $regex: search,
+            $options: "i"
+        }
+    }).select("_id");
+
+    const categoryIds = categories.map(cat => cat._id);
+
+    query.$or = [
+        {
+            title: {
                 $regex: search,
                 $options: "i"
-            };
+            }
+        },
+        {
+            author: {
+                $regex: search,
+                $options: "i"
+            }
+        },
+        {
+            category: {
+                $in: categoryIds
+            }
         }
+    ];
+}
 
 
         // GET PRODUCTS
@@ -87,7 +111,7 @@ async (req, res) => {
                 currentPage:
                     page,
 
-                search
+                search  
             }
         );
 
@@ -238,7 +262,7 @@ const softDeleteProduct = async (req, res) => {
             deletedAt: new Date()
         });
 
-        // ✅ Return clean JSON to the frontend fetch execution sequence
+        //  Return clean JSON to the frontend fetch execution sequence
         return res.json({ 
             success: true, 
             message: "Product soft-deleted successfully.",

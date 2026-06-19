@@ -7,6 +7,8 @@ import {
     createUserSession,
     destroySession
 } from "../../utils/sessionUtils.js";
+
+
 // GET VERIFY OTP PAGE
 const getVerifyOtp = (req, res, next) => {
     try {
@@ -77,11 +79,23 @@ const verifyOtp = async (req, res) => {
             password: userData.password
         });
 
-        await cleanupSessionSafely(req, res, "Signup OTP");
+        // Clear OTP-related session data
+        delete req.session.userOtp;
+        delete req.session.userData;
+        delete req.session.otpExpires;
+
+        await new Promise((resolve, reject) => {
+            req.session.save((err) => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+
         return res.redirect("/login");
 
     } catch (err) {
         console.error("OTP VERIFY ERROR:", err);
+
         return res.render("user/verifyOtp", {
             title: "Verify OTP",
             cssFile: "verifyOtp.css",
