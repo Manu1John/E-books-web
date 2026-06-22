@@ -1,5 +1,9 @@
-
 <%- include('../partials/header') %>
+
+<!-- Toastify CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
 <div class="container">
     <div class="form-card">
 
@@ -7,9 +11,8 @@
             <h1>Add Category</h1>
             <p>Create a new category for books</p>
         </div>
-      
 
-        <form action="/admin/add-category" method="POST"  id="categoryForm">
+        <form action="/admin/category/add" method="POST" id="categoryForm">
 
             <div class="form-group">
                 <label for="name">Category Name</label>
@@ -17,9 +20,8 @@
                     type="text"
                     id="name"
                     name="name"
-                    placeholder="Enter category name"                   
+                    placeholder="Enter category name"
                 />
-                <small class="error-message" id="nameError"></small>
             </div>
 
             <div class="form-group">
@@ -30,7 +32,6 @@
                     rows="5"
                     placeholder="Enter category description"
                 ></textarea>
-                <small class="error-message" id="descriptionError"></small>
             </div>
 
             <div class="form-group">
@@ -38,21 +39,12 @@
 
                 <div class="radio-group">
                     <label class="radio-option">
-                        <input
-                            type="radio"
-                            name="status"
-                            value="active"
-                            checked
-                        />
+                        <input type="radio" name="status" value="active" checked />
                         Active
                     </label>
 
                     <label class="radio-option">
-                        <input
-                            type="radio"
-                            name="status"
-                            value="inactive"
-                        />
+                        <input type="radio" name="status" value="inactive" />
                         Not Active
                     </label>
                 </div>
@@ -63,9 +55,19 @@
             </button>
 
         </form>
-          <% if (typeof error !== 'undefined' && error) { %> <div class="server-error"> <%= error %> </div> <% } %>
+
+        <!-- Server error converted to toast -->
+        <% if (typeof error !== 'undefined' && error) { %>
+        <script>
+            window.addEventListener("DOMContentLoaded", () => {
+                showToast("<%= error %>", "error");
+            });
+        </script>
+        <% } %>
+
     </div>
 </div>
+
+<script src="/js/addCategory.js"></script>
+
 <%- include('../partials/footer') %>
-
-

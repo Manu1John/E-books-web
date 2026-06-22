@@ -6,7 +6,7 @@
         <h1 class="logo">Admin Panel</h1>
 
         <ul class="menu">
-            <li><a href="/admin/dashboard">Dashboard</a></li>
+            <li><a href="/admin/users">Users</a></li>
             <li><a href="#">Reports</a></li>
             <li><a href="/admin/products">Products</a></li>
             <li><a href="#">Orders</a></li>
@@ -54,7 +54,7 @@
 
         <div class="page-header">
             <h2 class="page-title">Products</h2>
-            <a href="/admin/add-product"><button class="add-btn">Add Product</button></a>
+            <a href="/admin/product/add"><button class="add-btn">Add Product</button></a>
         </div>
 
         <div class="table-container">
@@ -117,7 +117,7 @@
                             </td>
 
                             <td>
-                                <a style="text-decoration: none;" href="/admin/edit-product/<%=product._id%>">
+                                <a style="text-decoration: none;" href="/admin/product/<%=product._id%>/edit">
                                     <button class="edit">
                                         Edit
                                     </button>
@@ -182,8 +182,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!confirmDelete) return; 
 
         try {
-            const response = await fetch(`/admin/delete-product/${productId}`, {
-                method: 'POST',
+            const response = await fetch(`/admin/product/${productId}/delete`, {
+                method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'
                 }

@@ -120,6 +120,7 @@ const getEditAddress = async (req, res) => {
         return res.render("user/editAddress", {
             title: "Edit Address",
             cssFile: "addAddress.css",
+            jsFile:"editAddress.js",
             address
         });
 

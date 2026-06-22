@@ -28,7 +28,7 @@
                         searchInput.value.trim();
 
                     window.location.href =
-                        `/admin/dashboard?search=${searchValue}`;
+                        `/admin/users?search=${searchValue}`;
 
                 }, 500);
 
@@ -43,7 +43,7 @@
             function () {
 
                 window.location.href =
-                    "/admin/dashboard";
+                    "/admin/users";
 
             }
         );

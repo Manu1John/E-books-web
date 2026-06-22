@@ -142,7 +142,7 @@ const changePassword = async (req, res) => {
         const user = await User.findById(userId);
 
         if (!user) {
-            return res.redirect("/user-profile");
+            return res.redirect("/profile/user");
         }
 
         // Current password check
@@ -219,7 +219,7 @@ const changePassword = async (req, res) => {
 
     } catch (error) {
         console.log("CHANGE PASSWORD ERROR:", error);
-        return res.redirect("/user-profile");
+        return res.redirect("/profile/user");
     }
 };
 export default {

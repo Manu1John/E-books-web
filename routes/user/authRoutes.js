@@ -26,7 +26,7 @@ router.post(
 
 // Signup
 router.get(
-    "/signup-user",
+    "/signup",
     markAuthFlowPage,
     disableCache,
     redirectLoggedInUser,
@@ -34,7 +34,7 @@ router.get(
 );
 
 router.post(
-    "/signup-user",
+    "/signup",
     redirectLoggedInUser,
     authControler.postUserSignup
 );

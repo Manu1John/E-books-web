@@ -1,54 +1,56 @@
+function showToast(message, type = "error") {
+    Toastify({
+        text: message,
+        duration: 3000,
+        gravity: "top",
+        position: "right",
+        close: true,
+        stopOnFocus: true,
+        style: {
+            background: type === "success" ? "#16a34a" : "#dc2626"
+        }
+    }).showToast();
+}
 
 document.addEventListener("DOMContentLoaded", () => {
-
     const form = document.getElementById("categoryForm");
+
     const nameInput = document.getElementById("name");
     const descriptionInput = document.getElementById("description");
 
-    const nameError = document.getElementById("nameError");
-    const descriptionError = document.getElementById("descriptionError");
-
-    form.addEventListener("submit", function (e) {
-
-        let isValid = true;
-
-        // Clear old errors
-        nameError.textContent = "";
-        descriptionError.textContent = "";
-
+    form.addEventListener("submit", (e) => {
         const name = nameInput.value.trim();
         const description = descriptionInput.value.trim();
 
         // Name validation
         if (!name) {
-            nameError.textContent =
-                "Category name is required";
-            isValid = false;
-        } else if (name.length < 3) {
-            nameError.textContent =
-                "Category name must be at least 3 characters";
-            isValid = false;
-        } else if (!/^[a-zA-Z\s]+$/.test(name)) {
-            nameError.textContent =
-                "Only letters and spaces are allowed";
-            isValid = false;
+            e.preventDefault();
+            return showToast("Category name is required");
+        }
+
+        if (name.length < 3) {
+            e.preventDefault();
+            return showToast("Category name must be at least 3 characters");
+        }
+
+        if (!/^[a-zA-Z\s]+$/.test(name)) {
+            e.preventDefault();
+            return showToast("Only letters and spaces are allowed");
         }
 
         // Description validation
         if (!description) {
-            descriptionError.textContent =
-                "Description is required";
-            isValid = false;
-        } else if (description.length < 10) {
-            descriptionError.textContent =
-                "Description must be at least 10 characters";
-            isValid = false;
+            e.preventDefault();
+            return showToast("Description is required");
         }
 
-        if (!isValid) {
+        if (description.length < 10) {
             e.preventDefault();
+            return showToast("Description must be at least 10 characters");
         }
+
+        // If everything passes → form submits normally
     });
 
+    
 });
-

@@ -7,7 +7,7 @@
         <h1 class="logo">Admin Panel</h1>
 
         <ul class="menu">
-            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">Users</a></li>
             <li><a href="#">Reports</a></li>
             <li><a href="/admin/products">Products</a></li>
             <li><a href="#">Orders</a></li>
@@ -25,7 +25,7 @@
         <div class="top-bar">
 
             <form
-                action="/admin/dashboard"
+                action="/admin/users"
                 method="GET"
                 id="searchForm"
             >
@@ -127,7 +127,7 @@
     <% if(user.isBlocked){ %>
 
         <form
-            action="/admin/unblock-user/<%= user.id %>?_method=PATCH"
+            action="/admin/user/<%= user.id %>/unblock?_method=PATCH"
             method="POST"
             style="display:inline;"
             onsubmit="return confirm('Are you sure you want to unblock this user?')"
@@ -143,7 +143,7 @@
     <% } else { %>
 
         <form
-            action="/admin/block-user/<%= user.id %>?_method=PATCH"
+            action="/admin/user/<%= user.id %>/block?_method=PATCH"
             method="POST"
             style="display:inline;"
             onsubmit="return confirm('Are you sure you want to block this user?')"

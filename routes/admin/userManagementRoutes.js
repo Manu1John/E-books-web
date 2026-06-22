@@ -1,5 +1,5 @@
 import express from "express"
-import {blockUser,unblockUser,getDashboard} from "../../controlers/admin/userManagementController.js";
+import {blockUser,unblockUser,getUserDashboard} from "../../controlers/admin/userManagementController.js";
 import {
     disableCache,
     isAuthenticated
@@ -7,24 +7,24 @@ import {
 
 const router = express.Router();
 router.patch(
-    "/block-user/:id",
+    "/user/:id/block",
     disableCache,
     isAuthenticated,
     blockUser
 );
 
 router.patch(
-    "/unblock-user/:id",
+    "/user/:id/unblock",
     disableCache,
     isAuthenticated,
     unblockUser
 );
 
 router.get(
-    "/dashboard",
+    "/users",
     disableCache,
     isAuthenticated,
-    getDashboard
+    getUserDashboard
 );
 
 export default router;

@@ -56,7 +56,7 @@
     <div class="form-container">
 
         <form
-            action="/edit-address/<%= address._id %>?_method=PUT"
+            action="/address/<%= address._id %>?_method=PUT"
             method="POST"
             class="address-form"
         >
@@ -72,7 +72,9 @@
                     name="fullName"
                     value="<%= address.fullName %>"
                     required
+                    id="fullName"
                 />
+                <small id="fullNameError"></small>
 
             </div>
 
@@ -87,8 +89,9 @@
                     name="phone"
                     value="<%= address.phone %>"
                     required
+                    id="phone"
                 />
-
+                <small id="phoneError"></small>
             </div>
 
             <div class="form-group">
@@ -102,8 +105,9 @@
                     name="house"
                     value="<%= address.addressLine.split(',')[0]?.trim() || '' %>"
                     required
+                    id="house"
                 />
-
+<small id="houseError"></small>
             </div>
 
             <div class="form-group">
@@ -117,8 +121,9 @@
                     name="area"
                     value="<%= address.addressLine.split(',')[1]?.trim() || '' %>"
                     required
+                    id="area"
                 />
-
+<small id="areaError"></small>
             </div>
 
             <div class="form-group">
@@ -132,8 +137,9 @@
                     name="landmark"
                     value="<%= address.landmark || '' %>"
                     placeholder="Nearby landmark"
+                    id="landmark"
                 />
-
+<small id="landmarkError"></small>
             </div>
 
             <div class="two-col">
@@ -149,8 +155,9 @@
                         name="city"
                         value="<%= address.city %>"
                         required
+                        id="city"
                     />
-
+<small id="cityError"></small>
                 </div>
 
                 <div class="form-group">
@@ -164,6 +171,7 @@
                         name="state"
                         value="<%= address.state %>"
                         required
+      
                     />
 
                 </div>
@@ -183,8 +191,9 @@
                         name="pincode"
                         value="<%= address.pincode %>"
                         required
+                        id="pincode"
                     />
-
+            <small id="pincodeError"></small>
                 </div>
 
                 <div class="form-group">
@@ -233,6 +242,7 @@
                 <button
                     type="submit"
                     class="save-btn"
+                    id="update-btn"
                 >
                     Update Address
                 </button>

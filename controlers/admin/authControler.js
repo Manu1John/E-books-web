@@ -12,7 +12,7 @@ import bcrypt from "bcrypt"
 export const getAdminLogin = (req, res) => {
     try {
         if (req.session.admin) {
-            return res.redirect("/admin/dashboard");
+            return res.redirect("/admin/users");
         }
 
         return res.render("admin/login", {
@@ -136,7 +136,7 @@ async (req, res) => {
         );
 
         return res.redirect(
-            "/admin/dashboard"
+            "/admin/users"
         );
 
     } catch (error) {

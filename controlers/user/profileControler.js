@@ -70,7 +70,7 @@ async (req, res) => {
         );
 
         return res.redirect(
-            "/user-profile"
+            "/profile/user"
         );
 
     } catch (error) {
@@ -78,7 +78,7 @@ async (req, res) => {
         console.log(error);
 
         return res.redirect(
-            "/user-profile"
+            "/profile/user"
         );
     }
 };

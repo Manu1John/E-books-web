@@ -6,13 +6,13 @@ import { authenticatedUser } from "../../middleware/authMiddleware.js";
 const router = express.Router();
 
 router.get(
-    "/user-profile",
+    "/profile/user",
     authenticatedUser,
     profileControler.getUserProfile
 );
 
 router.put(
-    "/update-profile",
+    "/profile/update",
     authenticatedUser,
     upload.single("profileImage"),
     profileControler.updateUserProfile

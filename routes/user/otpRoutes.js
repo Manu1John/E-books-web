@@ -25,7 +25,7 @@ router.post(
 );
 
 router.post(
-    "/resend-otp",
+    "/signup/resend-otp",
     disableCache,
     redirectLoggedInUser,
     otpControler.resendOtp

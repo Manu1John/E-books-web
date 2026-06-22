@@ -13,13 +13,11 @@ router.get(
     "/forgot-password",
     markAuthFlowPage,
     disableCache,
-    redirectLoggedInUser,
     passwordControler.getForgotPassword
 );
 
 router.post(
     "/forgot-password",
-    redirectLoggedInUser,
     passwordControler.postForgotPassword
 );
 

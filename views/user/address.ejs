@@ -52,7 +52,7 @@
         </div>
 
         <a
-            href="/add-address"
+            href="/address/new"
             class="add-address-btn"
         >
             + Add New Address
@@ -179,14 +179,14 @@
                         <div class="card-buttons">
 
                             <a
-                                href="/edit-address/<%= address._id %>"
+                                href="/address/<%= address._id %>/edit"
                                 class="edit-btn"
                             >
                                 Edit
                             </a>
 
                             <form
-                                action="/delete-address/<%= address._id %>?_method=DELETE"
+                                action="/address/<%= address._id %>?_method=DELETE"
                                 method="POST"
                             >
                                 <button

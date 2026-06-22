@@ -11,31 +11,31 @@ router.get(
 );
 
 router.get(
-    "/add-address",
+    "/address/new",
     authenticatedUser,
     addressControler.getAddAddressPage
 );
 
 router.post(
-    "/add-address",
+    "/address",
     authenticatedUser,
     addressControler.addAddress
 );
 
 router.get(
-    "/edit-address/:id",
+    "/address/:id/edit",
     authenticatedUser,
     addressControler.getEditAddress
 );
 
 router.put(
-    "/edit-address/:id",
+    "/address/:id",
     authenticatedUser,
     addressControler.updateAddress
 );
 
 router.delete(
-    "/delete-address/:id",
+    "/address/:id",
     authenticatedUser,
     addressControler.deleteAddress
 );

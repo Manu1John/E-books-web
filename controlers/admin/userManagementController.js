@@ -3,7 +3,7 @@ import User from "../../models/User.js";
 
 
 /* ---------------- DASHBOARD ---------------- */
-export const getDashboard =
+export const getUserDashboard =
 async (req, res) => {
     try {
 
@@ -62,14 +62,14 @@ async (req, res) => {
             );
 
         return res.render(
-            "admin/dashboard",
+            "admin/users",
             {
                 title:
-                    "admin dashboard",
+                    "User Management ",
                 cssFile:
-                    "dashboard.css",
+                    "users.css",
                 jsFile:
-                    "dashboard.js",
+                    "users.js",
                 users,
                 currentPage:
                     page,
@@ -110,7 +110,7 @@ async (req, res) => {
         );
 
         return res.redirect(
-            "/admin/dashboard"
+            "/admin/users"
         );
 
     } catch (error) {
@@ -143,7 +143,7 @@ async (req, res) => {
         );
 
         return res.redirect(
-            "/admin/dashboard"
+            "/admin/users"
         );
 
     } catch (error) {
@@ -154,7 +154,7 @@ async (req, res) => {
         );
 
         return res.redirect(
-            "/admin/dashboard"
+            "/admin/users"
         );
     }
 };
