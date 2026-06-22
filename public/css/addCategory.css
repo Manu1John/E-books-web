@@ -133,3 +133,28 @@ textarea {
     font-size: 14px;
 }
 
+/* Ensure the form-card can position the close button absolutely inside it */
+.form-card {
+    position: relative;
+    /* keep your existing card styles here (background, padding, border-radius, etc.) */
+}
+
+/* Close button layout styling */
+.close-popup-btn {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    font-size: 30px;
+    font-weight: 500;
+    color: #64748b;
+    text-decoration: none;
+    line-height: 1;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.close-popup-btn:hover {
+    color: #ef4444; /* Turns red on hover */
+    transform: scale(1.15); /* Slightly pops out */
+}
+
