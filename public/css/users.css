@@ -304,3 +304,134 @@ tbody td{
         overflow-x:auto;
     }
 }
+/* Append this to the bottom of your users.css file */
+
+/* TOAST NOTIFICATIONS */
+.toast-container {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.toast {
+    background: #ffffff;
+    color: #1e293b;
+    padding: 16px 24px;
+    border-radius: 14px;
+    box-shadow: 0 15px 35px rgba(15, 23, 42, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-weight: 500;
+    border-left: 6px solid #10b981;
+    transform: translateX(130%);
+    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.3s ease;
+    opacity: 0;
+    font-size: 14px;
+}
+
+.toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.toast.error {
+    border-left-color: #ef4444;
+}
+
+.toast i {
+    font-size: 18px;
+}
+.toast.success i { color: #10b981; }
+.toast.error i { color: #ef4444; }
+
+/* MODAL CONFIRMATION OVERLAY */
+.confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.confirm-overlay.show {
+    opacity: 1;
+}
+
+.confirm-box {
+    background: #ffffff;
+    padding: 32px;
+    border-radius: 24px;
+    width: 420px;
+    max-width: 90%;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    text-align: center;
+    transform: scale(0.85);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.confirm-overlay.show .confirm-box {
+    transform: scale(1);
+}
+
+.confirm-box h3 {
+    margin-bottom: 10px;
+    font-size: 22px;
+    color: #0f172a;
+    font-weight: 600;
+}
+
+.confirm-box p {
+    color: #64748b;
+    font-size: 15px;
+    margin-bottom: 28px;
+    line-height: 1.5;
+}
+
+.confirm-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+}
+
+.confirm-btn {
+    border: none;
+    padding: 14px 28px;
+    border-radius: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s;
+    font-size: 14px;
+}
+
+.confirm-btn.yes {
+    background: #0f172a;
+    color: #fff;
+}
+
+.confirm-btn.yes:hover {
+    background: #1e293b;
+    transform: translateY(-2px);
+}
+
+.confirm-btn.no {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.confirm-btn.no:hover {
+    background: #e2e8f0;
+    transform: translateY(-2px);
+}

@@ -1,3 +1,4 @@
+
 * {
     margin: 0;
     padding: 0;
@@ -121,3 +122,14 @@ textarea {
         padding: 20px;
     }
 }
+
+.server-error {
+    background: #ff0e0e;
+    color: #ffffff;
+    border: 1px solid #ffb3b3;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+

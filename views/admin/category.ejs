@@ -1,64 +1,46 @@
-
 <%- include('../partials/header') %>
+
+<!-- Toastify -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+
 
 <div class="container">
 
     <!-- Sidebar -->
     <aside class="sidebar">
-
-        <h1 class="logo">
-            Admin Panel
-        </h1>
+        <h1 class="logo">Admin Panel</h1>
 
         <ul class="menu">
-            <li>
-                <a href="/admin/users">
-                    Users
-                </a>
-            </li>
-
+            <li><a href="/admin/users">Users</a></li>
             <li><a href="#">Reports</a></li>
             <li><a href="/admin/products">Products</a></li>
             <li><a href="#">Orders</a></li>
             <li><a href="#">Offers</a></li>
             <li><a href="#">Coupons</a></li>
-
-            <li>
-                <a href="/admin/category">
-                    Categories
-                </a>
-            </li>
+            <li><a href="/admin/category">Categories</a></li>
         </ul>
-
     </aside>
 
-
-    <!-- Main Content -->
+    <!-- Main -->
     <main class="main-content">
 
-        <!-- Top Navbar -->
+        <!-- Top Bar -->
         <div class="top-bar">
 
-            <!-- Search -->
-            <form
-                action="/admin/category"
-                method="GET"
-            >
-
+            <form action="/admin/category" method="GET">
                 <div class="search-box">
-
                     <i class="fa fa-search"></i>
 
                     <input
                         type="text"
-                        id="searchInput"
                         name="search"
                         placeholder="Search by Category"
                         value="<%= search || '' %>"
                     >
 
                     <% if(search) { %>
-
                         <button
                             type="button"
                             class="clear-btn"
@@ -66,59 +48,32 @@
                         >
                             ✖
                         </button>
-
                     <% } %>
 
                 </div>
-
             </form>
 
-
-            <!-- Logout -->
-            <form
-                action="/admin/logout"
-                method="POST"
-            >
-                <button
-                    class="logout-btn"
-                    type="submit"
-                >
-                    <i class="fa-solid fa-right-from-bracket"></i>
+            <form action="/admin/logout" method="POST">
+                <button class="logout-btn" type="submit">
                     Logout
                 </button>
             </form>
 
         </div>
 
-
-        <!-- Add Category -->
-        <form
-            action="/admin/category/add"
-            method="GET"
-        >
-            <button
-                type="submit"
-                class="addCategory-btn"
-                 id="openCategoryModal"
-            >
+        <!-- Add -->
+        <form action="/admin/category/add" method="GET">
+            <button type="submit" class="addCategory-btn">
                 Add Category
             </button>
         </form>
 
+        <h2 class="page-title">Categories</h2>
 
-        <h2 class="page-title">
-            Categories
-        </h2>
-
-        <h5 class="page-users-count">
-            Total Categories:
-            <%= totalCategories %>
-        </h5>
-
+        <h5>Total Categories: <%= totalCategories %></h5>
 
         <!-- Table -->
         <div class="table-container">
-
             <table>
 
                 <thead>
@@ -138,26 +93,13 @@
                         <% cat.forEach((category, index) => { %>
 
                             <tr>
-
-                                <td>
-                                    <%= (currentPage - 1) * 4 + index + 1 %>
-                                </td>
-
-                                <td>
-                                    <%= category.name %>
-                                </td>
-
-                                <td>
-                                    <%= category.description %>
-                                </td>
-
-                                <td>
-                                    <%= category.status %>
-                                </td>
+                                <td><%= (currentPage - 1) * 4 + index + 1 %></td>
+                                <td><%= category.name %></td>
+                                <td><%= category.description %></td>
+                                <td><%= category.status %></td>
 
                                 <td class="action-buttons">
 
-                                    <!-- Edit -->
                                     <a
                                         href="/admin/category/<%= category._id %>/edit"
                                         class="editCategory-btn"
@@ -165,60 +107,15 @@
                                         Edit
                                     </a>
 
-                                    <!-- Delete -->
-<button
-    type="button"
-    class="delete-btn"
-    onclick="deleteCategory('<%= category._id%>')"
->
-    Delete
-</button>
-
-<script>
-window.deleteCategory = async function(categoryId) {
-
-    const isConfirmed = confirm(
-        "Are you sure you want to delete this category?"
-    );
-
-    if (!isConfirmed) return;
-
-    try {
-
-        const response = await fetch(
-            `/admin/category/${categoryId}/delete`,
-            {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            }
-        );
-
-        const data = await response.json();
-
-        if (response.ok && data.success) {
-
-            alert("Category deleted successfully!");
-            location.reload();
-
-        } else {
-
-            alert(data.message || "Failed to delete category.");
-
-        }
-
-    } catch (error) {
-
-        console.error("Error deleting category:", error);
-        alert("Something went wrong. Check console for details.");
-
-    }
-};
-</script>
+                                    <button
+                                        type="button"
+                                        class="delete-btn"
+                                        onclick="openDeleteModal('<%= category._id %>')"
+                                    >
+                                        Delete
+                                    </button>
 
                                 </td>
-
                             </tr>
 
                         <% }) %>
@@ -226,10 +123,7 @@ window.deleteCategory = async function(categoryId) {
                     <% } else { %>
 
                         <tr>
-                            <td
-                                colspan="5"
-                                style="text-align:center;"
-                            >
+                            <td colspan="5" style="text-align:center;">
                                 No categories found
                             </td>
                         </tr>
@@ -239,63 +133,56 @@ window.deleteCategory = async function(categoryId) {
                 </tbody>
 
             </table>
-
         </div>
-
 
         <!-- Pagination -->
         <% if(totalPages > 1) { %>
+        <div class="pagination">
 
-            <div class="pagination">
+            <% if(currentPage > 1) { %>
+                <a href="/admin/category?page=<%= currentPage - 1 %>&search=<%= search || '' %>">
+                    Previous
+                </a>
+            <% } %>
 
-                <!-- Previous -->
-                <% if(currentPage > 1) { %>
+            <% for(let i = 1; i <= totalPages; i++) { %>
+                <a
+                    href="/admin/category?page=<%= i %>&search=<%= search || '' %>"
+                    class="<%= currentPage === i ? 'active-page' : '' %>"
+                >
+                    <%= i %>
+                </a>
+            <% } %>
 
-                    <a
-                        href="/admin/category?page=<%= currentPage - 1 %>&search=<%= search || '' %>"
-                        class="page-btn"
-                    >
-                        Previous
-                    </a>
+            <% if(currentPage < totalPages) { %>
+                <a href="/admin/category?page=<%= currentPage + 1 %>&search=<%= search || '' %>">
+                    Next
+                </a>
+            <% } %>
 
-                <% } %>
-
-
-                <!-- Page Numbers -->
-                <% for(let i = 1; i <= totalPages; i++) { %>
-
-                    <a
-                        href="/admin/category?page=<%= i %>&search=<%= search || '' %>"
-                        class="
-                            page-btn
-                            <%= currentPage === i ? 'active-page' : '' %>
-                        "
-                    >
-                        <%= i %>
-                    </a>
-
-                <% } %>
-
-
-                <!-- Next -->
-                <% if(currentPage < totalPages) { %>
-
-                    <a
-                        href="/admin/category?page=<%= currentPage + 1 %>&search=<%= search || '' %>"
-                        class="page-btn"
-                    >
-                        Next
-                    </a>
-
-                <% } %>
-
-            </div>
-
+        </div>
         <% } %>
 
     </main>
-
 </div>
 
-<%- include('../partials/footer') %>
+<!-- ===== DELETE MODAL ===== -->
+<div id="deleteModal" class="modal-overlay">
+    <div class="modal-box">
+        <h3>Delete Category</h3>
+        <p>Are you sure you want to delete this category?</p>
 
+        <div class="modal-actions">
+            <button id="cancelDelete" class="modal-btn cancel">
+                Cancel
+            </button>
+
+            <button id="confirmDelete" class="modal-btn delete">
+                Delete
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<%- include('../partials/footer') %>

@@ -1,5 +1,7 @@
 <%- include('../partials/header') %>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <div class="container">
 
     <aside class="sidebar">
@@ -20,11 +22,7 @@
 
         <div class="top-bar">
 
-            <form
-                action="/admin/products"
-                method="GET"
-                id="searchForm"
-            >
+            <form action="/admin/products" method="GET" id="searchForm">
                 <div class="search-box">
                     <i class="fa fa-search"></i>
                     <input
@@ -34,11 +32,7 @@
                         placeholder="Search product..."
                         value="<%= search || '' %>"
                     >
-                    <button
-                        type="button"
-                        class="clear-btn"
-                        id="clearButton"
-                    >
+                    <button type="button" class="clear-btn" id="clearButton">
                         ✖
                     </button>
                 </div>
@@ -170,38 +164,73 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', async function (e) {
-        // Find if the clicked element or its closest parent is our target delete button
         const button = e.target.closest('.delete-product-btn');
-        if (!button) return; // Exit if they clicked something else
+        if (!button) return; 
 
         e.preventDefault();
 
         const productId = button.getAttribute('data-id');
         
-        const confirmDelete = confirm("Are you sure you want to soft-delete this product? It will be hidden from the storefront.");
-        if (!confirmDelete) return; 
+        // SweetAlert2 Confirmation Dialog
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to soft-delete this product? It will be hidden from the storefront.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const response = await fetch(`/admin/product/${productId}/delete`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
 
-        try {
-            const response = await fetch(`/admin/product/${productId}/delete`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        // Modern Toast Pop-up Notification Configuration
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 1500,
+                            timerProgressBar: true
+                        });
+
+                        // Display the success toast
+                        await Toast.fire({
+                            icon: 'success',
+                            title: 'Product deleted successfully'
+                        });
+
+                        // Redirect after toast timeline ends
+                        window.location.href = data.redirectUrl || '/admin/products';
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed to delete',
+                            text: data.error || "Unknown server error",
+                            confirmButtonColor: '#2563eb'
+                        });
+                    }
+
+                } catch (error) {
+                    console.error("Deletion Fetch Error:", error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Network Error',
+                        text: 'A network error occurred while trying to delete the product.',
+                        confirmButtonColor: '#2563eb'
+                    });
                 }
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                // Instantly update layout by navigating where backend tells us
-                window.location.href = data.redirectUrl || '/admin/products';
-            } else {
-                alert("Failed to delete: " + (data.error || "Unknown server error"));
             }
-
-        } catch (error) {
-            console.error("Deletion Fetch Error:", error);
-            alert("A network error occurred while trying to delete the product.");
-        }
+        });
     });
 });
 </script>
