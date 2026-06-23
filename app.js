@@ -1,3 +1,4 @@
+import flash from "connect-flash";
 import dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
@@ -34,6 +35,7 @@ if (process.env.NODE_ENV === "production") {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+
 // static files
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -49,6 +51,13 @@ connectDB();
 app.use(methodOverride("_method"));
 app.use('/admin', session(adminSessionConfig), adminRoutes);
 app.use(session(userSessionConfig));
+app.use(flash());
+app.use((req, res, next) => {
+    res.locals.success = req.flash("success");
+    res.locals.error = req.flash("error");
+    next();
+});
+
 app.use(passport.initialize());
 app.use("/", userRoutes);
 

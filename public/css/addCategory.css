@@ -158,3 +158,31 @@ textarea {
     transform: scale(1.15); /* Slightly pops out */
 }
 
+css.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+.toast {
+  background-color: #4CAF50; /* Green success background */
+  color: white;
+  padding: 16px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  font-family: sans-serif;
+  animation: fadeIn 0.5s, fadeOut 0.5s 2.5s; /* Animates in and out */
+}
+
+@keyframes fadeIn {
+  from { right: -300px; opacity: 0; }
+  to { right: 20px; opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { right: 20px; opacity: 1; }
+  to { right: -300px; opacity: 0; }
+}
+

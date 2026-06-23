@@ -53,7 +53,11 @@
     </div>
 
     <div class="form-container">
-
+<% if (error) { %>
+    <div class="alert alert-danger">
+        <%= error %>
+    </div>
+<% } %>
         <form
             action="/address"
             method="POST"
@@ -247,6 +251,7 @@
         </form>
 
     </div>
+
 
 </section>
 
