@@ -1,6 +1,6 @@
 import express from 'express'
 import Products from "../../models/products.js"
- import Category from '../../models/category.js'
+import Category from '../../models/category.js'
 
 const getuserIndex = async (req, res) => {
   try {
@@ -10,22 +10,34 @@ const getuserIndex = async (req, res) => {
 
     const standardLimit = 4;
 
+    // Extract search query parameter
+    const searchQuery = req.query.search ? req.query.search.trim() : "";
+
+    // Base query conditions for search
+    const searchFilter = searchQuery ? {
+      $or: [
+        { name: { $regex: searchQuery, $options: "i" } },
+        { title: { $regex: searchQuery, $options: "i" } },
+        { author: { $regex: searchQuery, $options: "i" } }
+      ]
+    } : {};
+
     // ================= 1. POPULAR BOOKS ("ALL" TAB PAGINATION) =================
     const allPage = parseInt(req.query.page_all) || 1;
     const allSkip = (allPage - 1) * standardLimit;
 
-    const allProducts = await Products.find({
+    const allProductsCondition = {
       isDeleted: false,
-      status: "active"
-    })
+      status: "active",
+      ...searchFilter
+    };
+
+    const allProducts = await Products.find(allProductsCondition)
       .populate("category")
       .skip(allSkip)
       .limit(standardLimit);
 
-    const totalAll = await Products.countDocuments({
-      isDeleted: false,
-      status: "active"
-    });
+    const totalAll = await Products.countDocuments(allProductsCondition);
     const allTotalPages = Math.ceil(totalAll / standardLimit) || 1;
 
     // ================= 2. POPULAR BOOKS (INDIVIDUAL CATEGORY PAGINATION) =================
@@ -36,20 +48,19 @@ const getuserIndex = async (req, res) => {
         const page = parseInt(req.query[`page_${cat._id}`]) || 1;
         const skip = (page - 1) * standardLimit;
 
-        const products = await Products.find({
+        const categoryProductsCondition = {
           isDeleted: false,
           status: "active",
-          category: cat._id
-        })
+          category: cat._id,
+          ...searchFilter
+        };
+
+        const products = await Products.find(categoryProductsCondition)
           .populate("category")
           .skip(skip)
           .limit(standardLimit);
 
-        const total = await Products.countDocuments({
-          isDeleted: false,
-          status: "active",
-          category: cat._id
-        });
+        const total = await Products.countDocuments(categoryProductsCondition);
 
         return {
           category: cat,
@@ -64,36 +75,36 @@ const getuserIndex = async (req, res) => {
     const featuredPage = parseInt(req.query.page_featured) || 1;
     const featuredSkip = (featuredPage - 1) * standardLimit;
 
-    const featuredProducts = await Products.find({
+    const featuredCondition = {
       isDeleted: false,
-      status: "active"
-    })
+      status: "active",
+      ...searchFilter
+    };
+
+    const featuredProducts = await Products.find(featuredCondition)
       .sort({ createdAt: -1 })
       .skip(featuredSkip)
       .limit(standardLimit);
 
-    const totalFeatured = await Products.countDocuments({
-      isDeleted: false,
-      status: "active"
-    });
+    const totalFeatured = await Products.countDocuments(featuredCondition);
     const featuredTotalPages = Math.ceil(totalFeatured / standardLimit) || 1;
 
     // ================= 4. SPECIAL OFFERS PAGINATION =================
     const offerPage = parseInt(req.query.page_offer) || 1;
     const offerSkip = (offerPage - 1) * standardLimit;
 
-    const offerProducts = await Products.find({
+    const offerCondition = {
       isDeleted: false,
-      status: "active"
-    })
+      status: "active",
+      ...searchFilter
+    };
+
+    const offerProducts = await Products.find(offerCondition)
       .sort({ price: 1 })
       .skip(offerSkip)
       .limit(standardLimit);
 
-    const totalOffers = await Products.countDocuments({
-      isDeleted: false,
-      status: "active"
-    });
+    const totalOffers = await Products.countDocuments(offerCondition);
     const offerTotalPages = Math.ceil(totalOffers / standardLimit) || 1;
 
     // Render the template with all multi-pagination variables
@@ -126,22 +137,34 @@ const getHome = async (req, res, next) => {
 
     const standardLimit = 4;
 
+    // Extract search query parameter
+    const searchQuery = req.query.search ? req.query.search.trim() : "";
+
+    // Base query conditions for search
+    const searchFilter = searchQuery ? {
+      $or: [
+        { name: { $regex: searchQuery, $options: "i" } },
+        { title: { $regex: searchQuery, $options: "i" } },
+        { author: { $regex: searchQuery, $options: "i" } }
+      ]
+    } : {};
+
     // ================= 1. POPULAR BOOKS ("ALL GENRE" PAGINATION) =================
     const allPage = parseInt(req.query.page_all) || 1;
     const allSkip = (allPage - 1) * standardLimit;
 
-    const allProducts = await Products.find({
+    const allProductsCondition = {
       isDeleted: false,
-      status: "active"
-    })
+      status: "active",
+      ...searchFilter
+    };
+
+    const allProducts = await Products.find(allProductsCondition)
       .populate("category")
       .skip(allSkip)
       .limit(standardLimit);
 
-    const totalAll = await Products.countDocuments({
-      isDeleted: false,
-      status: "active"
-    });
+    const totalAll = await Products.countDocuments(allProductsCondition);
     const allTotalPages = Math.ceil(totalAll / standardLimit) || 1;
 
     // ================= 2. POPULAR BOOKS (CATEGORY WISE PAGINATION) =================
@@ -152,20 +175,19 @@ const getHome = async (req, res, next) => {
         const page = parseInt(req.query[`page_${cat._id}`]) || 1;
         const skip = (page - 1) * standardLimit;
 
-        const products = await Products.find({
+        const categoryProductsCondition = {
           isDeleted: false,
           status: "active",
-          category: cat._id
-        })
+          category: cat._id,
+          ...searchFilter
+        };
+
+        const products = await Products.find(categoryProductsCondition)
           .populate("category")
           .skip(skip)
           .limit(standardLimit);
 
-        const total = await Products.countDocuments({
-          isDeleted: false,
-          status: "active",
-          category: cat._id
-        });
+        const total = await Products.countDocuments(categoryProductsCondition);
 
         return {
           category: cat,
@@ -180,42 +202,40 @@ const getHome = async (req, res, next) => {
     const featuredPage = parseInt(req.query.page_featured) || 1;
     const featuredSkip = (featuredPage - 1) * standardLimit;
 
-    const featuredProducts = await Products.find({
+    const featuredCondition = {
       isDeleted: false,
-      status: "active"
-    })
+      status: "active",
+      ...searchFilter
+    };
+
+    const featuredProducts = await Products.find(featuredCondition)
       .sort({ createdAt: -1 })
       .skip(featuredSkip)
       .limit(standardLimit);
 
-    const totalFeatured = await Products.countDocuments({
-      isDeleted: false,
-      status: "active"
-    });
+    const totalFeatured = await Products.countDocuments(featuredCondition);
     const featuredTotalPages = Math.ceil(totalFeatured / standardLimit) || 1;
 
     // ================= 4. SPECIAL OFFERS PAGINATION =================
     const offerPage = parseInt(req.query.page_offer) || 1;
     const offerSkip = (offerPage - 1) * standardLimit;
 
-    const offerProducts = await Products.find({
+    const offerCondition = {
       isDeleted: false,
-      status: "active"
-    })
+      status: "active",
+      ...searchFilter
+    };
+
+    const offerProducts = await Products.find(offerCondition)
       .sort({ price: 1 })
       .skip(offerSkip)
       .limit(standardLimit);
 
-    const totalOffers = await Products.countDocuments({
-      isDeleted: false,
-      status: "active"
-    });
+    const totalOffers = await Products.countDocuments(offerCondition);
     const offerTotalPages = Math.ceil(totalOffers / standardLimit) || 1;
 
     // Render the logged-in home context while passing all isolated multi-pagination metrics
     return res.render("user/home", {
-      title: "home",
-      cssFile: "home.css",
       user: req.session.user,
       allProducts,
       allPage,

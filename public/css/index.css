@@ -3811,3 +3811,124 @@ body.chocolat-open > .chocolat-image-wrapper {
 .product-item {
     text-align: center;
 }
+
+		#header {
+			position: sticky !important;
+			top: 0;
+			z-index: 9999;
+			background-color: #ffffff !important;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+			padding: 15px 0;
+			transition: all 0.3s ease;
+		}
+		.navbar-search-form .search-input {
+			border: 1px solid #ccc;
+			border-radius: 20px 0 0 20px;
+			padding: 6px 15px;
+			font-size: 14px;
+			outline: none;
+		}
+		.navbar-search-form .search-btn {
+			border: 1px solid #111;
+			background-color: #111;
+			color: #fff;
+			border-radius: 0 20px 20px 0;
+			padding: 6px 20px;
+			font-size: 14px;
+			transition: background 0.2s ease;
+		}
+		.navbar-search-form .search-btn:hover {
+			background-color: #333;
+		}
+    		#header {
+			position: sticky !important;
+			top: 0;
+			z-index: 9999;
+			background-color: #ffffff !important;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+			padding: 15px 0;
+			transition: all 0.3s ease;
+		}
+		.navbar-search-form .search-input {
+			border: 1px solid #ccc;
+			border-radius: 20px 0 0 20px;
+			padding: 6px 15px;
+			font-size: 14px;
+			outline: none;
+		}
+		.navbar-search-form .search-btn {
+			border: 1px solid #111;
+			background-color: #111;
+			color: #fff;
+			border-radius: 0 20px 20px 0;
+			padding: 6px 20px;
+			font-size: 14px;
+			transition: background 0.2s ease;
+		}
+		.navbar-search-form .search-btn:hover {
+			background-color: #333;
+		}
+		.logout-form-inline {
+			display: inline-block;
+			margin-right: 15px;
+		}
+		.logout-btn {
+			background: none;
+			border: none;
+			color: #333;
+			font-size: 14px;
+			cursor: pointer;
+		}
+    /* =======================================================
+   STICKY NAVBAR & SEARCH BAR UI FIXES
+======================================================= */
+/* Keep navbar fixed at top when scrolling past header bar */
+#header {
+    position: sticky !important;
+    top: 0;
+    z-index: 9999;
+    background-color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 15px 0;
+    transition: all 0.3s ease;
+}
+
+/* Clear button reset properties */
+.clear-btn {
+    background: transparent;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    padding: 0;
+    line-height: 1;
+}
+
+.clear-btn:hover {
+    color: #333;
+}
+
+/* Rounded search input */
+.navbar-search-form .search-input {
+    border: 1px solid #ccc;
+    border-radius: 20px 0 0 20px;
+    padding: 6px 35px 6px 15px !important;
+    font-size: 14px;
+    outline: none;
+}
+
+/* Rounded search submit */
+.navbar-search-form .search-btn {
+    border: 1px solid #111;
+    background-color: #111;
+    color: #fff;
+    border-radius: 0 20px 20px 0;
+    padding: 6px 20px;
+    font-size: 14px;
+    transition: background 0.2s ease;
+    margin: 0;
+}
+
+.navbar-search-form .search-btn:hover {
+    background-color: #333;
+}

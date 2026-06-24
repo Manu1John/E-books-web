@@ -139,3 +139,40 @@
 
 
 })(jQuery);
+
+/* =======================================================
+   SEARCH DEBOUNCE AND CLEAR FUNCTIONALITY 
+======================================================= */
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('clearBtn');
+    const searchForm = document.getElementById('navSearchForm');
+    let debounceTimer;
+
+    if (searchInput && clearBtn && searchForm) {
+        // Debounce search on typing
+        searchInput.addEventListener('input', (e) => {
+            const value = e.target.value.trim();
+            
+            // Show clear button immediately if there's text
+            clearBtn.style.display = value ? 'block' : 'none';
+
+            // Reset the timer
+            clearTimeout(debounceTimer);
+            
+            // Auto submit after user stops typing for 600ms
+            debounceTimer = setTimeout(() => {
+                searchForm.submit();
+            }, 600); 
+        });
+
+        // Clear button behavior
+        clearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            clearBtn.style.display = 'none';
+            
+            // Re-submit the form without the search string to clear results
+            searchForm.submit();
+        });
+    }
+});

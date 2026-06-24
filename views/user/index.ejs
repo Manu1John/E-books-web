@@ -1,4 +1,9 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Books Store</title>
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
 		integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
 
@@ -14,7 +19,6 @@
 </head>
 
 <% 
-	// Stateful URL helper: captures query parameters, the current target hash, and active tab identity
 	function getPageUrl(paramName, paramValue, anchor, tabId) {
 		let params = new URLSearchParams(query || {});
 		params.set(paramName, paramValue);
@@ -24,13 +28,12 @@
 		return "?" + params.toString() + (anchor ? anchor : '');
 	}
 
-	// Read state tracker to decide which active display layout classes to apply
 	let activeTabId = (typeof query !== 'undefined' && query.activeTab) ? query.activeTab : 'all-books';
 %>
 
 <body data-bs-spy="scroll" data-bs-target="#header" tabindex="0">
 
-	<div id="header-wrap">
+	<div id="header-wrap" class="sticky-top bg-white shadow-sm">
 		<div class="top-content">
 			<div class="container-fluid">
 				<div class="row">
@@ -47,31 +50,22 @@
 					<div class="col-md-6">
 						<div class="right-element">
 							<a href="/login" class="user-login for-buy"><i class="icon icon-login"></i><span>Login</span></a>
-							<div class="action-menu">
-								<div class="search-bar">
-									<a href="#" class="search-button search-toggle" data-selector="#header-wrap">
-										<i class="icon icon-search"></i>
-									</a>
-									<form role="search" method="get" class="search-box">
-										<input class="search-field text search-input" placeholder="Search" type="search">
-									</form>
-								</div>
-							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-
+		
 		<header id="header">
 			<div class="container-fluid">
-				<div class="row">
+				<div class="row align-items-center">
 					<div class="col-md-2">
 						<div class="main-logo">
-							<a href="index.html"><img src="images/main-logo.png" alt="logo"></a>
+							<a href="/"><img src="images/main-logo.png" alt="logo"></a>
 						</div>
 					</div>
-					<div class="col-md-10">
+
+					<div class="col-md-6">
 						<nav id="navbar">
 							<div class="main-menu stellarnav">
 								<ul class="menu-list">
@@ -89,6 +83,30 @@
 							</div>
 						</nav>
 					</div>
+
+					<div class="col-md-4">
+						<div class="d-flex justify-content-end">
+							<form role="search" method="get" action="/" id="searchFormIndex" class="navbar-search-form d-flex w-100 position-relative" style="max-width: 300px;">
+								
+								<% if (typeof query !== 'undefined' && query.sort) { %><input type="hidden" name="sort" value="<%= query.sort %>"><% } %>
+								<% if (typeof query !== 'undefined' && query.category) { %><input type="hidden" name="category" value="<%= query.category %>"><% } %>
+								<% if (typeof query !== 'undefined' && query.minPrice) { %><input type="hidden" name="minPrice" value="<%= query.minPrice %>"><% } %>
+								<% if (typeof query !== 'undefined' && query.maxPrice) { %><input type="hidden" name="maxPrice" value="<%= query.maxPrice %>"><% } %>
+								<input type="hidden" name="activeTab" value="all-books">
+					
+								<input id="searchInputIndex" class="form-control search-input" placeholder="Search books..." type="text" name="search" value="<%= typeof query !== 'undefined' && query.search ? query.search : '' %>" style="padding-right: 35px; border-radius: 20px 0 0 20px;">
+								
+								<button type="button" id="clearBtnIndex" class="clear-search-btn" style="position: absolute; right: 65px; top: 50%; transform: translateY(-50%); background: none; border: none; padding: 0; color: #999; font-size: 20px; line-height: 1; z-index: 10; cursor: pointer; display: <%= typeof query !== 'undefined' && query.search ? 'block' : 'none' %>;">
+									&times;
+								</button>
+					
+								<button type="submit" class="search-btn">
+									<i class="icon icon-search"></i>
+								</button>
+							</form>
+						</div>
+					</div>
+
 				</div>
 			</div>
 		</header>
@@ -164,6 +182,10 @@
 												<a href="/product/<%= product._id %>">
 													<img src="/uploads/<%= product.images[0] %>" alt="<%= product.title %>" class="img-fluid">
 												</a>
+											<% } else { %>
+												<a href="/product/<%= product._id %>">
+													<img src="images/product-item1.jpg" alt="Books" class="img-fluid">
+												</a>
 											<% } %>
 											<button type="button" class="add-to-cart">Add to Cart</button>
 										</figure>
@@ -231,6 +253,52 @@
 						<h2 class="section-title">Popular Books</h2>
 					</div>
 
+					<div class="filter-sort-bar mb-4 p-3 bg-light rounded border" data-aos="fade-up">
+						<form method="get" action="/" class="row g-3 align-items-end">
+							<% if (typeof query !== 'undefined' && query.search) { %>
+								<input type="hidden" name="search" value="<%= query.search %>">
+							<% } %>
+							<input type="hidden" name="activeTab" value="all-books">
+
+							<div class="col-lg-3 col-md-6">
+								<label class="form-label mb-1" style="font-size: 0.85em; font-weight: 600;">Category</label>
+								<select name="category" class="form-select form-select-sm">
+									<option value="">All Categories</option>
+									<% categoryData.forEach(item => { %>
+										<option value="<%= item.category._id %>" <%= typeof query !== 'undefined' && query.category == item.category._id ? 'selected' : '' %>>
+											<%= item.category.name %>
+										</option>
+									<% }) %>
+								</select>
+							</div>
+
+							<div class="col-lg-4 col-md-6">
+								<label class="form-label mb-1" style="font-size: 0.85em; font-weight: 600;">Price Range (₹)</label>
+								<div class="d-flex gap-2 align-items-center">
+									<input type="number" name="minPrice" class="form-control form-control-sm" placeholder="Min" value="<%= typeof query !== 'undefined' ? query.minPrice : '' %>" min="0">
+									<span>-</span>
+									<input type="number" name="maxPrice" class="form-control form-control-sm" placeholder="Max" value="<%= typeof query !== 'undefined' ? query.maxPrice : '' %>" min="0">
+								</div>
+							</div>
+
+							<div class="col-lg-3 col-md-6">
+								<label class="form-label mb-1" style="font-size: 0.85em; font-weight: 600;">Sort By</label>
+								<select name="sort" class="form-select form-select-sm">
+									<option value="">Default (Newest)</option>
+									<option value="price_asc" <%= typeof query !== 'undefined' && query.sort === 'price_asc' ? 'selected' : '' %>>Price: Low to High</option>
+									<option value="price_desc" <%= typeof query !== 'undefined' && query.sort === 'price_desc' ? 'selected' : '' %>>Price: High to Low</option>
+									<option value="az" <%= typeof query !== 'undefined' && query.sort === 'az' ? 'selected' : '' %>>Title: A - Z</option>
+									<option value="za" <%= typeof query !== 'undefined' && query.sort === 'za' ? 'selected' : '' %>>Title: Z - A</option>
+								</select>
+							</div>
+
+							<div class="col-lg-2 col-md-6 d-flex gap-2">
+								<button type="submit" class="btn btn-dark btn-sm flex-grow-1 m-0" style="height: 31px;">Apply</button>
+								<a href="/?activeTab=all-books#popular-books" class="btn btn-outline-secondary btn-sm flex-grow-1 m-0 d-flex align-items-center justify-content-center" style="height: 31px;">Clear</a>
+							</div>
+						</form>
+					</div>
+
 					<ul class="tabs">
 						<li class="tab <%= activeTabId === 'all-books' ? 'active' : '' %>" data-tab-target="#all-books">All</li>
 						<% categoryData.forEach(item => { %>
@@ -240,56 +308,23 @@
 						<% }) %>
 					</ul>
 
-					<div id="all-books" data-tab-content class="<%= activeTabId === 'all-books' ? 'active' : '' %>">
-						<div class="row">
-							<% if (allProducts.length === 0) { %>
-								<p class="text-muted p-3">No products available</p>
-							<% } %>
-							<% allProducts.forEach(product => { %>
-								<div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-									<div class="product-item">
-										<figure class="product-style">
-											<% if(product.images && product.images.length > 0){ %>
-												<a href="/product/<%= product._id %>">
-													<img src="/uploads/<%= product.images[0] %>" class="img-fluid">
-												</a>
-											<% } %>
-											<button class="add-to-cart">Add To Cart</button>
-										</figure>
-										<figcaption>
-											<h3><%= product.title %></h3>
-											<span><%= product.author %></span>
-											<div class="item-price">₹<%= product.price %></div>
-										</figcaption>
-									</div>
-								</div>
-							<% }) %>
-						</div>
-
-						<div class="pagination mt-4 d-flex gap-2 justify-content-center">
-							<% for(let i = 1; i <= allTotalPages; i++) { %>
-								<a href="<%= getPageUrl('page_all', i, '#popular-books', 'all-books') %>"
-								   class="btn btn-sm <%= allPage === i ? 'btn-dark' : 'btn-outline-dark' %>">
-									<%= i %>
-								</a>
-							<% } %>
-						</div>
-					</div>
-
-					<% categoryData.forEach(item => { %>
-						<div id="cat-<%= item.category._id %>" data-tab-content class="<%= activeTabId === 'cat-' + item.category._id ? 'active' : '' %>">
+					<div class="tab-content">
+						<div id="all-books" data-tab-content class="<%= activeTabId === 'all-books' ? 'active' : '' %>">
 							<div class="row">
-								<% if (item.products.length === 0) { %>
-									<p class="text-muted p-3">No products in this category</p>
+								<% if (allProducts && allProducts.length === 0) { %>
+									<p class="text-muted p-3">No products matched your search or filters.</p>
 								<% } %>
-
-								<% item.products.forEach(product => { %>
+								<% if (allProducts) { allProducts.forEach(product => { %>
 									<div class="col-lg-3 col-md-4 col-sm-6 mb-4">
 										<div class="product-item">
 											<figure class="product-style">
 												<% if(product.images && product.images.length > 0){ %>
 													<a href="/product/<%= product._id %>">
 														<img src="/uploads/<%= product.images[0] %>" class="img-fluid">
+													</a>
+												<% } else { %>
+													<a href="/product/<%= product._id %>">
+														<img src="images/product-item1.jpg" class="img-fluid">
 													</a>
 												<% } %>
 												<button class="add-to-cart">Add To Cart</button>
@@ -301,20 +336,62 @@
 											</figcaption>
 										</div>
 									</div>
-								<% }) %>
+								<% }) } %>
 							</div>
 
 							<div class="pagination mt-4 d-flex gap-2 justify-content-center">
-								<% for(let i = 1; i <= item.totalPages; i++){ %>
-									<a href="<%= getPageUrl('page_' + item.category._id, i, '#popular-books', 'cat-' + item.category._id) %>"
-									   class="btn btn-sm <%= item.page === i ? 'btn-dark' : 'btn-outline-dark' %>">
+								<% for(let i = 1; i <= allTotalPages; i++) { %>
+									<a href="<%= getPageUrl('page_all', i, '#popular-books', 'all-books') %>"
+									   class="btn btn-sm <%= allPage === i ? 'btn-dark' : 'btn-outline-dark' %>">
 										<%= i %>
 									</a>
 								<% } %>
 							</div>
 						</div>
-					<% }) %>
 
+						<% categoryData.forEach(item => { %>
+							<div id="cat-<%= item.category._id %>" data-tab-content class="<%= activeTabId === 'cat-' + item.category._id ? 'active' : '' %>">
+								<div class="row">
+									<% if (item.products.length === 0) { %>
+										<p class="text-muted p-3">No products in this category</p>
+									<% } %>
+
+									<% item.products.forEach(product => { %>
+										<div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+											<div class="product-item">
+												<figure class="product-style">
+													<% if(product.images && product.images.length > 0){ %>
+														<a href="/product/<%= product._id %>">
+															<img src="/uploads/<%= product.images[0] %>" class="img-fluid">
+														</a>
+													<% } else { %>
+														<a href="/product/<%= product._id %>">
+															<img src="images/product-item2.jpg" class="img-fluid">
+														</a>
+													<% } %>
+													<button class="add-to-cart">Add To Cart</button>
+												</figure>
+												<figcaption>
+													<h3><%= product.title %></h3>
+													<span><%= product.author %></span>
+													<div class="item-price">₹<%= product.price %></div>
+												</figcaption>
+											</div>
+										</div>
+									<% }) %>
+								</div>
+
+								<div class="pagination mt-4 d-flex gap-2 justify-content-center">
+									<% for(let i = 1; i <= item.totalPages; i++){ %>
+										<a href="<%= getPageUrl('page_' + item.category._id, i, '#popular-books', 'cat-' + item.category._id) %>"
+										   class="btn btn-sm <%= item.page === i ? 'btn-dark' : 'btn-outline-dark' %>">
+											<%= i %>
+										</a>
+									<% } %>
+								</div>
+							</div>
+						<% }) %>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -348,6 +425,8 @@
 											<a href="/product/<%= product._id %>">
 												<% if (product.images && product.images.length > 0) { %>
 													<img src="/uploads/<%= product.images[0] %>" alt="<%= product.title %>" class="img-fluid">
+												<% } else { %>
+													<img src="images/product-item5.jpg" alt="Books" class="img-fluid">
 												<% } %>
 											</a>
 											<button type="button" class="add-to-cart">Add to Cart</button>
@@ -466,6 +545,33 @@
 		</div>
 	</section>
 
+	<section id="download-app" class="leaf-pattern-overlay">
+		<div class="corner-pattern-overlay"></div>
+		<div class="container">
+			<div class="row justify-content-center">
+				<div class="col-md-8">
+					<div class="row">
+						<div class="col-md-5">
+							<figure>
+								<img src="images/device.png" alt="phone" class="single-image">
+							</figure>
+						</div>
+						<div class="col-md-7">
+							<div class="app-info">
+								<h2 class="section-title divider">Download our app now !</h2>
+								<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sagittis sed ptibus liberolectus nonet psryroin.</p>
+								<div class="google-app">
+									<img src="images/google-play.jpg" alt="google play">
+									<img src="images/app-store.jpg" alt="app store">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
 	<footer id="footer">
 		<div class="container">
 			<div class="row">
@@ -530,4 +636,35 @@
 		</div>
 	</div>
 
+	<script>
+		document.addEventListener('DOMContentLoaded', () => {
+			const searchInput = document.getElementById('searchInputIndex');
+			const clearBtn = document.getElementById('clearBtnIndex');
+			const searchForm = document.getElementById('searchFormIndex');
+			let debounceTimer;
+
+			if (searchInput && clearBtn && searchForm) {
+				// Show clear button instantly when typing
+				searchInput.addEventListener('input', (e) => {
+					clearBtn.style.display = e.target.value.trim() ? 'block' : 'none';
+					
+					// Optional: Automatically submit after user stops typing for 500ms
+					clearTimeout(debounceTimer);
+					debounceTimer = setTimeout(() => {
+						searchForm.submit();
+					}, 600); 
+				});
+
+				// Clear the input and reload without the search parameter
+				clearBtn.addEventListener('click', () => {
+					searchInput.value = '';
+					clearBtn.style.display = 'none';
+					
+					// Submitting the form with an empty value clears the results
+					searchForm.submit(); 
+				});
+			}
+		});
+	</script>
 </body>
+</html>
